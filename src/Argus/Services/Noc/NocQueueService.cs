@@ -38,6 +38,7 @@ public class NocQueueService : BackgroundService, INocQueueService
     private readonly INocHttpClient _nocHttpClient;
     private readonly ISuppressionCache _suppressionCache;
     private readonly INocHealthService _nocHealthService;
+    private readonly NocConfiguration _nocConfig;
     private readonly ConcurrentQueue<NocDecision> _queue = new();
 
     // Track sent payloads for verification (keyed by fingerprint)
@@ -50,7 +51,8 @@ public class NocQueueService : BackgroundService, INocQueueService
         IArgusMetrics metrics,
         INocHttpClient nocHttpClient,
         ISuppressionCache suppressionCache,
-        INocHealthService nocHealthService)
+        INocHealthService nocHealthService,
+        IOptions<NocConfiguration> nocConfig)
     {
         _logger = logger;
         _alertsVector = alertsVector;
@@ -59,6 +61,7 @@ public class NocQueueService : BackgroundService, INocQueueService
         _nocHttpClient = nocHttpClient;
         _suppressionCache = suppressionCache;
         _nocHealthService = nocHealthService;
+        _nocConfig = nocConfig.Value;
     }
 
     /// <inheritdoc />
@@ -164,6 +167,15 @@ public class NocQueueService : BackgroundService, INocQueueService
         {
             _logger.LogDebug(
                 "NOC Decision: Skipping HTTP POST for CREATE alert {Name} (send_to_noc=false). CorrelationId={CorrelationId} ExecutionId={ExecutionId}",
+                currentAlert.Name, decision.CorrelationId, currentAlert.ExecutionId);
+            return;
+        }
+
+        // Check if NOC HTTP is globally enabled
+        if (!_nocConfig.Enabled)
+        {
+            _logger.LogDebug(
+                "NOC Decision: Skipping HTTP POST for CREATE alert {Name} (NOC disabled). CorrelationId={CorrelationId} ExecutionId={ExecutionId}",
                 currentAlert.Name, decision.CorrelationId, currentAlert.ExecutionId);
             return;
         }
@@ -280,10 +292,32 @@ public class NocQueueService : BackgroundService, INocQueueService
         var alertsToSend = stillCancels.Where(a => a!.SendToNoc).ToList();
         var alertsToSkipSend = stillCancels.Where(a => !a!.SendToNoc).ToList();
 
-        // Process alerts that need NOC POST (send_to_noc=true)
-        foreach (var alert in alertsToSend)
+        // Check if NOC HTTP is globally enabled
+        if (!_nocConfig.Enabled)
         {
-            await ProcessCancelAlertWithNocAsync(alert!, decision.CorrelationId, cancellationToken);
+            // NOC disabled - skip HTTP but still remove alerts from vector
+            foreach (var alert in alertsToSend)
+            {
+                _logger.LogDebug(
+                    "NOC Decision: Skipping HTTP POST for CANCEL alert {Name} (NOC disabled). CorrelationId={CorrelationId} ExecutionId={ExecutionId}",
+                    alert!.Name, decision.CorrelationId, alert.ExecutionId);
+
+                var removed = _alertsVector.RemoveAlert(alert.Fingerprint);
+                if (removed)
+                {
+                    _logger.LogDebug(
+                        "Removed CANCEL alert from vector (NOC disabled): {Name} (Priority={Priority}, Fingerprint={Fingerprint}). CorrelationId={CorrelationId} ExecutionId={ExecutionId}",
+                        alert.Name, alert.Priority, alert.Fingerprint, decision.CorrelationId, alert.ExecutionId);
+                }
+            }
+        }
+        else
+        {
+            // NOC enabled - process alerts that need NOC POST (send_to_noc=true)
+            foreach (var alert in alertsToSend)
+            {
+                await ProcessCancelAlertWithNocAsync(alert!, decision.CorrelationId, cancellationToken);
+            }
         }
 
         // Remove alerts with send_to_noc=false from vector (no NOC send needed)

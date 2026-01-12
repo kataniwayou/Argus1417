@@ -52,6 +52,7 @@ public class HeartbeatService : IHeartbeatService
     private readonly IArgusMetrics _metrics;
     private readonly INocHttpClient _nocHttpClient;
     private readonly INocHealthService _nocHealthService;
+    private readonly NocConfiguration _nocConfig;
     private readonly HeartbeatConfiguration _heartbeatConfig;
     private readonly FileHeartbeatConfiguration _fileConfig;
     private readonly HttpHeartbeatConfiguration _httpConfig;
@@ -77,6 +78,7 @@ public class HeartbeatService : IHeartbeatService
         IArgusMetrics metrics,
         INocHttpClient nocHttpClient,
         INocHealthService nocHealthService,
+        IOptions<NocConfiguration> nocConfig,
         IOptions<ArgusConfiguration> config)
     {
         _logger = logger;
@@ -86,13 +88,14 @@ public class HeartbeatService : IHeartbeatService
         _metrics = metrics;
         _nocHttpClient = nocHttpClient;
         _nocHealthService = nocHealthService;
+        _nocConfig = nocConfig.Value;
         _heartbeatConfig = config.Value.Heartbeat;
         _fileConfig = _heartbeatConfig.File;
         _httpConfig = _heartbeatConfig.Http;
 
         _logger.LogInformation(
-            "HeartbeatService initialized. FileEnabled={FileEnabled}, HttpEnabled={HttpEnabled}, NocCircuitBreakerThreshold={Threshold}",
-            _fileConfig.Enabled, _httpConfig.Enabled, _nocHealthService.FailureThreshold);
+            "HeartbeatService initialized. NocEnabled={NocEnabled}, FileEnabled={FileEnabled}, HttpEnabled={HttpEnabled}, NocCircuitBreakerThreshold={Threshold}",
+            _nocConfig.Enabled, _fileConfig.Enabled, _httpConfig.Enabled, _nocHealthService.FailureThreshold);
     }
 
     public void Start()
@@ -189,7 +192,7 @@ public class HeartbeatService : IHeartbeatService
             // Phase 1: Only leader sends actual HTTP
             // Phase 2: Both leader and follower verify
             bool nocVerifySuccess = true;
-            if (_httpConfig.Enabled)
+            if (_httpConfig.Enabled && _nocConfig.Enabled)
             {
                 nocVerifySuccess = await SendHttpHeartbeatAsync(tick, correlationId, isLeader, rolePrefix, stoppingToken);
 
@@ -202,6 +205,12 @@ public class HeartbeatService : IHeartbeatService
                 {
                     _nocHealthService.RecordFailure();
                 }
+            }
+            else if (_httpConfig.Enabled && !_nocConfig.Enabled)
+            {
+                _logger.LogDebug(
+                    "{Role}: Skipping NOC HTTP heartbeat (NOC disabled). Tick={Tick}, CorrelationId={CorrelationId}",
+                    rolePrefix, tick, correlationId);
             }
 
             // Update per-heartbeat NOC verify state (for logging)

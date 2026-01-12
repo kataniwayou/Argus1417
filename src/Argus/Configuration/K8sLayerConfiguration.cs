@@ -112,7 +112,7 @@ public class WatchdogConfiguration
             Custom1 = "ArgusTeam",
             Custom2 = "Watchdog",
             HostName = "ArgusServer",
-            Level = 1,
+            Level = 0,
             Message = "Watchdog heartbeat restored - Prometheus is healthy",
             Severity = "",
             Source = "watchdog",

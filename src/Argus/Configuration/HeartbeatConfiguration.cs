@@ -116,7 +116,7 @@ public class StatusFileSystemConfiguration
             Custom1 = "ArgusTeam",
             Custom2 = "StatusFileSystem",
             HostName = "ArgusServer",
-            Level = 1,
+            Level = 0,
             Message = "Destination path accessible",
             Severity = "info",
             Source = "status-filesystem",

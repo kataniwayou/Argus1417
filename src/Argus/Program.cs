@@ -25,6 +25,8 @@ builder.Services.Configure<DefaultNocConfiguration>(
     builder.Configuration.GetSection($"{ArgusConfiguration.SectionName}:DefaultNoc"));
 builder.Services.Configure<AlertsVectorConfiguration>(
     builder.Configuration.GetSection($"{ArgusConfiguration.SectionName}:AlertsVector"));
+builder.Services.Configure<NocConfiguration>(
+    builder.Configuration.GetSection($"{ArgusConfiguration.SectionName}:Noc"));
 builder.Services.Configure<NocHttpClientConfiguration>(
     builder.Configuration.GetSection($"{ArgusConfiguration.SectionName}:Noc:HttpClient"));
 

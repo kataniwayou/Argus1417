@@ -139,7 +139,7 @@ public class Alert
 
         // Determine status and level
         var status = IsFiring ? AlertStatus.CREATE : AlertStatus.CANCEL;
-        var level = status == AlertStatus.CREATE ? 3 : 1;
+        var level = status == AlertStatus.CREATE ? 3 : 0;
 
         // Create NocHttpPayload - runtime override fields are set here
         // At sending time, these will be re-applied from AlertDto to ensure consistency

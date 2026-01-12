@@ -38,7 +38,7 @@ public class DefaultNocConfiguration
             Custom1 = "ArgusTeam",
             Custom2 = "PrometheusAlert",
             HostName = "ArgusServer",
-            Level = 1,
+            Level = 0,
             Message = "Alert resolved",
             Severity = "",
             Source = "prometheus",

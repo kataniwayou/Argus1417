@@ -7,7 +7,7 @@ namespace Argus.Models;
 /// This is the JSON structure sent to the NOC API.
 /// 
 /// Runtime Override Rules:
-/// - level: Always overridden (3=CREATE, 1=CANCEL)
+/// - level: Always overridden (3=CREATE, 0=CANCEL)
 /// - message: Always overridden from AlertDto.Description
 /// - source: Always overridden from AlertDto.Source
 /// - suppressionKey: Always overridden from AlertDto.Fingerprint
@@ -33,7 +33,7 @@ public class NocHttpPayload
     public string HostName { get; set; } = string.Empty;
 
     /// <summary>
-    /// Alert level: 3=CREATE (firing), 1=CANCEL (resolved)
+    /// Alert level: 3=CREATE (firing), 0=CANCEL (resolved)
     /// Always overridden at runtime based on AlertDto.Status
     /// </summary>
     [JsonPropertyName("level")]
@@ -97,8 +97,8 @@ public class NocHttpPayload
     /// </summary>
     public void ApplyAlertOverrides(AlertDto alert)
     {
-        // Level: 3=CREATE, 1=CANCEL
-        Level = alert.Status == AlertStatus.CREATE ? 3 : 1;
+        // Level: 3=CREATE, 0=CANCEL
+        Level = alert.Status == AlertStatus.CREATE ? 3 : 0;
 
         // Message: Use Description, or Summary if Description is empty
         Message = !string.IsNullOrEmpty(alert.Description)
