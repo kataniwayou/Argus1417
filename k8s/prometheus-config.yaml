@@ -1,0 +1,71 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: argus
+  labels:
+    app: prometheus
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: argus
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+
+    # Configure Prometheus to push alerts to ALL Argus pods (fanout)
+    # Uses DNS service discovery with headless service to discover all pod IPs
+    # This ensures all pods receive alerts for consistent state (watchdog, alerts vector)
+    alerting:
+      alertmanagers:
+        - dns_sd_configs:
+            - names:
+                - 'argus-headless.argus.svc.cluster.local'
+              type: 'A'
+              port: 8080
+          # Use Alertmanager API v2 format
+          api_version: v2
+          # Timeout for sending alerts
+          timeout: 10s
+
+    rule_files:
+      - /etc/prometheus/alerts/*.yml
+
+    scrape_configs:
+      # Prometheus self-monitoring
+      - job_name: 'prometheus'
+        static_configs:
+          - targets: ['localhost:9090']
+
+      # Kube-state-metrics
+      - job_name: 'kube-state-metrics'
+        static_configs:
+          - targets: ['kube-state-metrics:8080']
+
+      # OpenTelemetry Collector
+      - job_name: 'otel-collector'
+        static_configs:
+          - targets: ['otel-collector:8888']
+
+      # Jaeger (distributed tracing)
+      - job_name: 'jaeger'
+        static_configs:
+          - targets: ['jaeger:14269']
+
+      # Note: Elasticsearch and Kibana don't expose native Prometheus metrics.
+      # To monitor them with Prometheus, deploy dedicated exporters:
+      # - Elasticsearch: prometheus-elasticsearch-exporter
+      # - Kibana: prometheus-kibana-exporter (limited metrics available)
+      #
+      # The infrastructure alerts (Down, NotReady, CrashLooping) use KSM metrics
+      # and will still detect pod/container-level issues.
+      #
+      # Uncomment and configure these jobs when exporters are deployed:
+      #
+      # - job_name: 'elasticsearch-exporter'
+      #   static_configs:
+      #     - targets: ['elasticsearch-exporter.argus-infrastructure:9114']
+      #
+      # - job_name: 'kibana-exporter'
+      #   static_configs:
+      #     - targets: ['kibana-exporter.argus-infrastructure:9684']

@@ -1,0 +1,158 @@
+# Elasticsearch PersistentVolumeClaim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: elasticsearch-data-pvc
+  namespace: argus
+  labels:
+    app: elasticsearch
+    component: search
+    app.kubernetes.io/name: elasticsearch
+    app.kubernetes.io/part-of: argus
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: hostpath
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: elasticsearch
+  namespace: argus
+  labels:
+    app: elasticsearch
+    component: search
+    app.kubernetes.io/name: elasticsearch
+    app.kubernetes.io/part-of: argus
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate  # Prevents concurrent pods accessing same PVC
+  selector:
+    matchLabels:
+      app: elasticsearch
+  template:
+    metadata:
+      labels:
+        app: elasticsearch
+        component: search
+        app.kubernetes.io/name: elasticsearch
+        app.kubernetes.io/part-of: argus
+    spec:
+      terminationGracePeriodSeconds: 120  # Allow graceful Elasticsearch shutdown
+      containers:
+      - name: elasticsearch
+        image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+        ports:
+        - containerPort: 9200
+          name: http
+        - containerPort: 9300
+          name: transport
+        env:
+        - name: discovery.type
+          value: "single-node"
+        - name: xpack.security.enabled
+          value: "false"
+        - name: xpack.security.enrollment.enabled
+          value: "false"
+        - name: xpack.security.http.ssl.enabled
+          value: "false"
+        - name: xpack.security.transport.ssl.enabled
+          value: "false"
+        - name: cluster.name
+          value: "argus-cluster"
+        - name: node.name
+          value: "argus-node"
+        - name: ES_JAVA_OPTS
+          value: "-Xms2g -Xmx2g"
+        - name: http.cors.enabled
+          value: "true"
+        - name: bootstrap.memory_lock
+          value: "true"
+        - name: cluster.routing.allocation.disk.threshold_enabled
+          value: "false"
+        volumeMounts:
+        - name: elasticsearch-data
+          mountPath: /usr/share/elasticsearch/data
+        # Startup probe - allows long initialization time for ES
+        startupProbe:
+          httpGet:
+            path: /_cluster/health
+            port: 9200
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 10
+          failureThreshold: 30  # Allow 5 minutes for startup
+          successThreshold: 1
+        # Liveness probe - less aggressive after startup
+        livenessProbe:
+          httpGet:
+            path: /_cluster/health
+            port: 9200
+            scheme: HTTP
+          initialDelaySeconds: 180
+          periodSeconds: 60
+          timeoutSeconds: 15
+          failureThreshold: 3
+          successThreshold: 1
+        # Readiness probe - check cluster status
+        readinessProbe:
+          httpGet:
+            path: /_cluster/health?wait_for_status=yellow&timeout=30s
+            port: 9200
+            scheme: HTTP
+          initialDelaySeconds: 120
+          periodSeconds: 30
+          timeoutSeconds: 35
+          failureThreshold: 3
+          successThreshold: 1
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh", "-c", "curl -X POST 'localhost:9200/_cluster/nodes/_local/_shutdown'"]
+        resources:
+          requests:
+            memory: "2Gi"
+            cpu: "500m"
+          limits:
+            memory: "4Gi"
+            cpu: "2000m"
+        securityContext:
+          capabilities:
+            add:
+              - IPC_LOCK
+      volumes:
+      - name: elasticsearch-data
+        persistentVolumeClaim:
+          claimName: elasticsearch-data-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch
+  namespace: argus
+  labels:
+    app: elasticsearch
+    component: search
+    app.kubernetes.io/name: elasticsearch
+    app.kubernetes.io/part-of: argus
+spec:
+  type: ClusterIP
+  ports:
+  - name: http
+    port: 9200
+    targetPort: 9200
+    protocol: TCP
+  - name: transport
+    port: 9300
+    targetPort: 9300
+    protocol: TCP
+  selector:
+    app: elasticsearch
+

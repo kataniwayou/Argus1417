@@ -1,0 +1,12 @@
+C:\Users\UserL\source\repos\Argus1413\src\ArgusApi\bin\Release\net9.0\ArgusApi.deps.json
+C:\Users\UserL\source\repos\Argus1413\src\ArgusApi\bin\Release\net9.0\ArgusApi.dll
+C:\Users\UserL\source\repos\Argus1413\src\ArgusApi\bin\Release\net9.0\ArgusApi.pdb
+C:\Users\UserL\source\repos\Argus1413\src\ArgusApi\obj\Release\net9.0\ArgusApi.csproj.AssemblyReference.cache
+C:\Users\UserL\source\repos\Argus1413\src\ArgusApi\obj\Release\net9.0\ArgusApi.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\UserL\source\repos\Argus1413\src\ArgusApi\obj\Release\net9.0\ArgusApi.AssemblyInfoInputs.cache
+C:\Users\UserL\source\repos\Argus1413\src\ArgusApi\obj\Release\net9.0\ArgusApi.AssemblyInfo.cs
+C:\Users\UserL\source\repos\Argus1413\src\ArgusApi\obj\Release\net9.0\ArgusApi.csproj.CoreCompileInputs.cache
+C:\Users\UserL\source\repos\Argus1413\src\ArgusApi\obj\Release\net9.0\ArgusApi.dll
+C:\Users\UserL\source\repos\Argus1413\src\ArgusApi\obj\Release\net9.0\refint\ArgusApi.dll
+C:\Users\UserL\source\repos\Argus1413\src\ArgusApi\obj\Release\net9.0\ArgusApi.pdb
+C:\Users\UserL\source\repos\Argus1413\src\ArgusApi\obj\Release\net9.0\ref\ArgusApi.dll

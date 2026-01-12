@@ -1,0 +1,175 @@
+# Argus Deployment and Service
+# The central health monitoring service for the observability stack
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argus
+  namespace: argus
+  labels:
+    app: argus
+    app.kubernetes.io/name: argus
+    app.kubernetes.io/part-of: argus
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: argus
+  template:
+    metadata:
+      labels:
+        app: argus
+        app.kubernetes.io/name: argus
+        app.kubernetes.io/part-of: argus
+    spec:
+      serviceAccountName: argus
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 0
+      containers:
+      - name: argus
+        image: argus:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+          name: http
+        env:
+        - name: ASPNETCORE_ENVIRONMENT
+          value: "Production"
+        - name: ASPNETCORE_URLS
+          value: "http://+:8080"
+        - name: Argus__K8sLayer__Kubernetes__UseInClusterConfig
+          value: "true"
+        # OpenTelemetry Collector endpoint for metrics export
+        - name: OpenTelemetry__CollectorEndpoint
+          value: "http://otel-collector:4317"
+        # Leader election - pod identity from downward API
+        - name: POD_NAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        - name: POD_NAMESPACE
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.namespace
+        livenessProbe:
+          httpGet:
+            path: /livez
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 30
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /readyz
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        volumeMounts:
+        - name: argus-data
+          mountPath: /var/argus
+      volumes:
+      - name: argus-data
+        hostPath:
+          path: /run/desktop/mnt/host/c/tmp/argus
+          type: DirectoryOrCreate
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: argus
+  namespace: argus
+  labels:
+    app: argus
+    app.kubernetes.io/name: argus
+    app.kubernetes.io/part-of: argus
+spec:
+  selector:
+    app: argus
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+
+---
+# Headless service for Prometheus alert fanout
+# DNS returns all pod IPs, allowing Prometheus to send alerts to ALL pods
+apiVersion: v1
+kind: Service
+metadata:
+  name: argus-headless
+  namespace: argus
+  labels:
+    app: argus
+    app.kubernetes.io/name: argus
+    app.kubernetes.io/part-of: argus
+spec:
+  clusterIP: None  # Headless - DNS returns all pod IPs
+  selector:
+    app: argus
+  ports:
+  - name: http
+    port: 8080
+    targetPort: 8080
+
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: argus
+  namespace: argus
+  labels:
+    app: argus
+    app.kubernetes.io/name: argus
+    app.kubernetes.io/part-of: argus
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: argus
+  namespace: argus
+  labels:
+    app: argus
+    app.kubernetes.io/name: argus
+    app.kubernetes.io/part-of: argus
+rules:
+# Read pods for Layer 1 health checks
+- apiGroups: [""]
+  resources: ["pods"]
+  verbs: ["get", "list", "watch"]
+# Leader election using Kubernetes Leases
+- apiGroups: ["coordination.k8s.io"]
+  resources: ["leases"]
+  verbs: ["get", "create", "update"]
+
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: argus
+  namespace: argus
+  labels:
+    app: argus
+    app.kubernetes.io/name: argus
+    app.kubernetes.io/part-of: argus
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: argus
+subjects:
+- kind: ServiceAccount
+  name: argus
+  namespace: argus
+

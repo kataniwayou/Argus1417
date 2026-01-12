@@ -1,0 +1,1763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Argus - Executive Presentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a2e;
+        }
+
+        .slide {
+            width: 1280px;
+            height: 720px;
+            /* PowerPoint 16:9 aspect ratio */
+            margin: 20px auto;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a3e 50%, #0d0d1a 100%);
+            position: relative;
+            overflow: hidden;
+            border: 3px solid #ff0000;
+            box-shadow: none;
+            page-break-after: always;
+        }
+
+        /* Slide 1: Title Slide */
+        .slide-1 {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-1 .content {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+            padding: 40px;
+        }
+
+        .slide-1 .argus-image {
+            width: 380px;
+            height: 450px;
+            border-radius: 20px;
+            object-fit: cover;
+            box-shadow: 0 0 60px rgba(100, 150, 255, 0.3),
+                        0 0 120px rgba(100, 150, 255, 0.1);
+            border: 3px solid rgba(100, 150, 255, 0.4);
+        }
+
+        .slide-1 .title-section {
+            text-align: left;
+            max-width: 600px;
+        }
+
+        .slide-1 h1 {
+            font-size: 72px;
+            font-weight: 700;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 8px;
+            margin-bottom: 20px;
+            text-shadow: 0 0 40px rgba(100, 150, 255, 0.5);
+        }
+
+        .slide-1 .tagline {
+            font-size: 28px;
+            color: #7aa2f7;
+            font-weight: 300;
+            letter-spacing: 3px;
+            margin-bottom: 40px;
+        }
+
+        .slide-1 .subtitle {
+            font-size: 20px;
+            color: #a0a0b0;
+            line-height: 1.6;
+            border-left: 4px solid #7aa2f7;
+            padding-left: 20px;
+        }
+
+        .slide-1 .decorative-eyes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.1;
+        }
+
+        .eye {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #7aa2f7 30%, transparent 70%);
+        }
+
+        /* Slide 2: What is Argus? */
+        .slide-2 {
+            padding: 30px 50px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide-header {
+            margin-bottom: 15px;
+        }
+
+        .slide-header h2 {
+            font-size: 38px;
+            font-weight: 600;
+            color: #ffffff;
+            margin: 0;
+            letter-spacing: 2px;
+        }
+
+        .header-line {
+            width: 90px;
+            height: 3px;
+            background: linear-gradient(90deg, #7aa2f7, #3d59a1);
+            margin-top: 10px;
+            border-radius: 2px;
+        }
+
+        .slide-body {
+            flex: 1;
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .bullet-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            width: 100%;
+        }
+
+        .bullet-list li {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 6px;
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 8px;
+            border-left: 3px solid #7aa2f7;
+        }
+
+        .bullet-icon {
+            font-size: 20px;
+            margin-right: 14px;
+            min-width: 28px;
+            text-align: center;
+        }
+
+        .bullet-content strong {
+            display: block;
+            font-size: 17px;
+            color: #ffffff;
+            margin-bottom: 2px;
+            font-weight: 600;
+        }
+
+        .bullet-content p {
+            font-size: 13px;
+            color: #a0a0b0;
+            margin: 0;
+            line-height: 1.3;
+        }
+
+        /* Slide 3: Architecture Diagram */
+        .slide-3 {
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide-3 .slide-header {
+            margin-bottom: 10px;
+        }
+
+        .architecture-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .arch-svg {
+            width: 100%;
+            height: 100%;
+            max-height: 560px;
+        }
+
+        .cluster-box {
+            fill: rgba(122, 162, 247, 0.08);
+            stroke: #3d59a1;
+            stroke-width: 2;
+            stroke-dasharray: 8 4;
+        }
+
+        .cluster-label {
+            fill: #7aa2f7;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .component-box {
+            stroke-width: 2;
+        }
+
+        .component-box.k8s {
+            fill: rgba(125, 211, 252, 0.15);
+            stroke: #7dd3fc;
+        }
+
+        .component-box.ksm {
+            fill: rgba(134, 239, 172, 0.15);
+            stroke: #86efac;
+        }
+
+        .component-box.prometheus {
+            fill: rgba(255, 158, 100, 0.15);
+            stroke: #ff9e64;
+        }
+
+        .component-box.argus {
+            fill: rgba(122, 162, 247, 0.25);
+            stroke: #7aa2f7;
+            stroke-width: 3;
+        }
+
+        .component-box.collector {
+            fill: rgba(187, 154, 247, 0.15);
+            stroke: #bb9af7;
+        }
+
+        .component-box.noc {
+            fill: rgba(248, 113, 113, 0.15);
+            stroke: #f87171;
+        }
+
+        .component-box.nas {
+            fill: rgba(251, 191, 36, 0.15);
+            stroke: #fbbf24;
+        }
+
+        .component-box.shob {
+            fill: rgba(168, 85, 247, 0.15);
+            stroke: #a855f7;
+        }
+
+        .component-box.infra {
+            fill: rgba(56, 189, 248, 0.15);
+            stroke: #38bdf8;
+        }
+
+        .infra-box {
+            fill: rgba(56, 189, 248, 0.05);
+            stroke: #0ea5e9;
+            stroke-width: 2;
+            stroke-dasharray: 6 3;
+        }
+
+        .business-box {
+            fill: rgba(52, 211, 153, 0.08);
+            stroke: #34d399;
+            stroke-width: 2;
+            stroke-dasharray: 6 3;
+        }
+
+        .component-box.app {
+            fill: rgba(52, 211, 153, 0.15);
+            stroke: #34d399;
+        }
+
+        .component-box.argus-api {
+            fill: rgba(122, 162, 247, 0.25);
+            stroke: #7aa2f7;
+        }
+
+        .component-label-micro {
+            fill: #a0a0b0;
+            font-size: 8px;
+            text-anchor: middle;
+            dominant-baseline: middle;
+        }
+
+        .component-label-small {
+            fill: #ffffff;
+            font-size: 11px;
+            font-weight: 600;
+            text-anchor: middle;
+            dominant-baseline: middle;
+        }
+
+        .component-label-tiny {
+            fill: #ffffff;
+            font-size: 10px;
+            font-weight: 600;
+            text-anchor: middle;
+            dominant-baseline: middle;
+        }
+
+        .component-label {
+            fill: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+            text-anchor: middle;
+            dominant-baseline: middle;
+        }
+
+        .component-label.argus-label {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .component-sublabel {
+            fill: #a0a0b0;
+            font-size: 11px;
+            text-anchor: middle;
+        }
+
+        .arrow {
+            stroke-width: 2;
+            fill: none;
+        }
+
+        .arrow-blue { stroke: #7aa2f7; }
+        .arrow-green { stroke: #9ece6a; }
+        .arrow-orange { stroke: #ff9e64; }
+        .arrow-purple { stroke: #bb9af7; }
+
+        .arrow-label {
+            fill: #c0c0d0;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .arrow-label-small {
+            fill: #a0a0b0;
+            font-size: 10px;
+        }
+
+        .legend-box {
+            fill: rgba(255, 255, 255, 0.03);
+            stroke: #3d59a1;
+            stroke-width: 1;
+        }
+
+        .legend-title {
+            fill: #ffffff;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .legend-text {
+            fill: #a0a0b0;
+            font-size: 11px;
+        }
+
+        /* Slide 4: Components Flow Diagram */
+        .slide-4 {
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide-4 .slide-header {
+            margin-bottom: 10px;
+        }
+
+        /* Slide 5: Components Detailed */
+        .slide-5 {
+            padding: 25px 30px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide-5 .slide-header {
+            margin-bottom: 12px;
+        }
+
+        .slide-5 .slide-header h2 {
+            font-size: 28px;
+        }
+
+        /* Slide 6: HA Leader-Follower */
+        .slide-6 {
+            padding: 25px 40px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide-6 .slide-header {
+            margin-bottom: 10px;
+        }
+
+        .slide-6 .ha-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-6 .ha-container svg {
+            width: 100%;
+            max-height: 520px;
+        }
+
+        /* Slide 7: Alerts Vector Flow */
+        .slide-7 {
+            padding: 25px 40px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide-7 .slide-header {
+            margin-bottom: 8px;
+        }
+
+        .slide-7 .vector-flow-container {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide-7 .vector-flow-container svg {
+            width: 100%;
+            max-height: 585px;
+        }
+
+        /* Slide 8: Competitive Landscape */
+        .slide-8 {
+            padding: 20px 40px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .slide-8 .slide-header {
+            margin-bottom: 10px;
+        }
+
+        .slide-8 .comparison-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .slide-8 .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+
+        .slide-8 .comparison-table th {
+            background: rgba(122, 162, 247, 0.2);
+            color: #7aa2f7;
+            padding: 10px 8px;
+            text-align: center;
+            font-weight: 600;
+            border-bottom: 2px solid #7aa2f7;
+        }
+
+        .slide-8 .comparison-table th.platform-col {
+            text-align: left;
+            width: 140px;
+        }
+
+        .slide-8 .comparison-table th.type-col {
+            width: 80px;
+        }
+
+        .slide-8 .comparison-table th.feature-col {
+            width: 90px;
+        }
+
+        .slide-8 .comparison-table th.pricing-col {
+            width: 100px;
+        }
+
+        .slide-8 .comparison-table td {
+            padding: 8px;
+            text-align: center;
+            border-bottom: 1px solid #3d3d50;
+            color: #c0c0d0;
+        }
+
+        .slide-8 .comparison-table .platform-name {
+            text-align: left;
+            font-weight: 500;
+            color: #e0e0e0;
+        }
+
+        .slide-8 .comparison-table .platform-name.argus {
+            color: #34d399;
+            font-weight: 700;
+        }
+
+        .slide-8 .comparison-table .argus-row {
+            background: rgba(52, 211, 153, 0.1);
+        }
+
+        .slide-8 .comparison-table .argus-row td {
+            border-bottom: 2px solid #34d399;
+        }
+
+        .slide-8 .comparison-table .check { color: #34d399; font-weight: bold; }
+        .slide-8 .comparison-table .cross { color: #f87171; }
+        .slide-8 .comparison-table .partial { color: #fbbf24; }
+        .slide-8 .comparison-table .dash { color: #606070; }
+
+        .slide-8 .comparison-table .pricing { color: #a0a0b0; font-size: 11px; }
+        .slide-8 .comparison-table .pricing.free { color: #34d399; font-weight: 600; }
+
+        .slide-8 .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .slide-8 .badge-saas { background: rgba(122, 162, 247, 0.2); color: #7aa2f7; }
+        .slide-8 .badge-oss { background: rgba(52, 211, 153, 0.2); color: #34d399; }
+        .slide-8 .badge-ent { background: rgba(187, 154, 247, 0.2); color: #bb9af7; }
+
+        .slide-8 .legend {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            font-size: 11px;
+            color: #808090;
+        }
+
+        .slide-8 .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .slide-8 .argus-advantages {
+            background: rgba(52, 211, 153, 0.08);
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            border-radius: 10px;
+            padding: 15px 20px;
+        }
+
+        .slide-8 .advantage-title {
+            color: #34d399;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .slide-8 .advantage-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .slide-8 .advantage-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(30, 30, 40, 0.6);
+            padding: 10px 15px;
+            border-radius: 8px;
+        }
+
+        .slide-8 .adv-icon {
+            font-size: 18px;
+        }
+
+        .slide-8 .adv-text {
+            color: #c0c0d0;
+            font-size: 12px;
+        }
+
+        .slide-8 .advantage-item.win {
+            border-left: 3px solid #34d399;
+        }
+
+        .slide-8 .comparison-table .noc-only {
+            color: #fbbf24;
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .slide-8 .gap-section {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #4d4d60;
+        }
+
+        .slide-8 .gap-title {
+            color: #808090;
+            font-size: 11px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .slide-8 .gap-items {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .slide-8 .gap-item {
+            background: rgba(248, 113, 113, 0.15);
+            color: #f87171;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+        }
+
+        .slide-8 .argus-features-detail {
+            background: rgba(52, 211, 153, 0.08);
+            border: 1px solid rgba(52, 211, 153, 0.3);
+            border-radius: 10px;
+            padding: 12px 16px;
+        }
+
+        .slide-8 .feature-detail-title {
+            color: #34d399;
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .slide-8 .feature-detail-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .slide-8 .feature-detail-grid.five-items {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .slide-8 .feature-detail-grid.five-items .feature-detail-item:nth-child(4),
+        .slide-8 .feature-detail-grid.five-items .feature-detail-item:nth-child(5) {
+            grid-column: span 1;
+        }
+
+        .slide-8 .feature-detail-item {
+            background: rgba(30, 30, 40, 0.6);
+            padding: 10px 12px;
+            border-radius: 8px;
+            border-left: 3px solid #34d399;
+        }
+
+        .slide-8 .fd-header {
+            color: #e0e0e0;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .slide-8 .fd-desc {
+            color: #a0a0b0;
+            font-size: 10px;
+            line-height: 1.4;
+        }
+
+        .slide-8 .fd-desc code {
+            background: rgba(122, 162, 247, 0.2);
+            color: #7aa2f7;
+            padding: 1px 4px;
+            border-radius: 3px;
+            font-family: 'Fira Code', monospace;
+            font-size: 9px;
+        }
+
+        @media print {
+            .slide {
+                margin: 0;
+                box-shadow: none;
+                page-break-after: always;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Slide 1: Title Slide -->
+    <div class="slide slide-1">
+        <div class="decorative-eyes">
+            <!-- Scattered eyes for atmosphere -->
+            <div class="eye" style="top: 10%; left: 5%;"></div>
+            <div class="eye" style="top: 5%; left: 15%;"></div>
+            <div class="eye" style="top: 15%; left: 8%;"></div>
+            <div class="eye" style="top: 8%; right: 10%;"></div>
+            <div class="eye" style="top: 12%; right: 5%;"></div>
+            <div class="eye" style="bottom: 15%; left: 3%;"></div>
+            <div class="eye" style="bottom: 10%; right: 8%;"></div>
+            <div class="eye" style="bottom: 5%; right: 15%;"></div>
+        </div>
+        <div class="content">
+            <img src="argus-panoptes.jpg" alt="Argus Panoptes - The All-Seeing Guardian" class="argus-image">
+            <div class="title-section">
+                <h1>ARGUS</h1>
+                <div class="tagline">The All-Seeing Guardian</div>
+                <div class="subtitle">
+                    Enterprise-Grade Observability Platform<br>
+                    Real-Time Monitoring • Intelligent Alerting • NOC Integration
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Slide 2: What is Argus? -->
+    <div class="slide slide-2">
+        <div class="slide-header">
+            <h2>What is Argus?</h2>
+            <div class="header-line"></div>
+        </div>
+        <div class="slide-body">
+            <ul class="bullet-list">
+                <li>
+                    <span class="bullet-icon">🛡️</span>
+                    <div class="bullet-content">
+                        <strong>Unified Observability Platform</strong>
+                        <p>Centralizes Kubernetes infrastructure health, Prometheus alerts, and application heartbeats into a single monitoring solution</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="bullet-icon">🔔</span>
+                    <div class="bullet-content">
+                        <strong>Intelligent NOC Integration</strong>
+                        <p>Automatically sends prioritized alerts to NOC systems with configurable suppression windows to prevent alert fatigue</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="bullet-icon">⏱️</span>
+                    <div class="bullet-content">
+                        <strong>Real-Time Watchdog Monitoring</strong>
+                        <p>Detects Prometheus failures through heartbeat expiration, ensuring no silent monitoring gaps go unnoticed</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="bullet-icon">📊</span>
+                    <div class="bullet-content">
+                        <strong>OpenTelemetry-Native Architecture</strong>
+                        <p>Built on OTEL standards for metrics, traces, and logs—seamlessly integrates with Grafana, Jaeger, and existing toolchains</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="bullet-icon">🔌</span>
+                    <div class="bullet-content">
+                        <strong>Simple Client SDK (ArgusApi)</strong>
+                        <p>Drop-in .NET library enabling any application to emit heartbeats, exceptions, and custom metrics with minimal code changes</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="bullet-icon">💓</span>
+                    <div class="bullet-content">
+                        <strong>CentralTimer & LivenessVector Architecture</strong>
+                        <p>Tick-based engine with internal callback health tracking—callbacks must stamp on completion or are marked unhealthy, ensuring self-healing resiliency</p>
+                    </div>
+                </li>
+                <li>
+                    <span class="bullet-icon">👑</span>
+                    <div class="bullet-content">
+                        <strong>Leader/Follower High Availability</strong>
+                        <p>Kubernetes Lease-based election ensures only one leader sends NOC alerts while all pods execute identical logic—automatic failover on leader failure</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+
+    <!-- Slide 3: Architecture Diagram -->
+    <div class="slide slide-3">
+        <div class="slide-header">
+            <h2>Architecture Diagram</h2>
+            <div class="header-line"></div>
+        </div>
+        <div class="architecture-container">
+            <svg viewBox="0 0 900 600" class="arch-svg">
+                <!-- Arrow Markers -->
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#7aa2f7"/>
+                    </marker>
+                    <marker id="arrowhead-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#9ece6a"/>
+                    </marker>
+                    <marker id="arrowhead-orange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#ff9e64"/>
+                    </marker>
+                    <marker id="arrowhead-purple" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#bb9af7"/>
+                    </marker>
+                    <marker id="arrowhead-shob" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#a855f7"/>
+                    </marker>
+                </defs>
+
+                <!-- Kubernetes Cluster Box -->
+                <rect x="20" y="20" width="200" height="260" rx="10" class="cluster-box"/>
+                <text x="35" y="45" class="cluster-label">Kubernetes Cluster</text>
+
+                <!-- K8s API Server -->
+                <rect x="35" y="60" width="130" height="50" rx="6" class="component-box k8s"/>
+                <text x="100" y="90" class="component-label-tiny">K8s API Server</text>
+
+                <!-- KSM -->
+                <rect x="35" y="130" width="130" height="50" rx="6" class="component-box ksm"/>
+                <text x="100" y="160" class="component-label-small">KSM</text>
+
+                <!-- Prometheus -->
+                <rect x="35" y="210" width="130" height="50" rx="6" class="component-box prometheus"/>
+                <text x="100" y="240" class="component-label-tiny">Prometheus</text>
+
+                <!-- Business Applications Box -->
+                <rect x="20" y="300" width="200" height="200" rx="10" class="business-box"/>
+                <text x="35" y="325" class="cluster-label">Business Applications</text>
+
+                <!-- App 1: Application part (2/3) -->
+                <rect x="35" y="340" width="110" height="45" rx="6" class="component-box app"/>
+                <text x="90" y="368" class="component-label-tiny">Application 1</text>
+                <!-- App 1: Argus API part (1/3) -->
+                <rect x="145" y="340" width="55" height="45" rx="6" class="component-box argus-api"/>
+                <text x="172" y="358" class="component-label-micro">Argus</text>
+                <text x="172" y="373" class="component-label-micro">API</text>
+
+                <!-- App 2: Application part (2/3) -->
+                <rect x="35" y="395" width="110" height="45" rx="6" class="component-box app"/>
+                <text x="90" y="423" class="component-label-tiny">Application 2</text>
+                <!-- App 2: Argus API part (1/3) -->
+                <rect x="145" y="395" width="55" height="45" rx="6" class="component-box argus-api"/>
+                <text x="172" y="413" class="component-label-micro">Argus</text>
+                <text x="172" y="428" class="component-label-micro">API</text>
+
+                <!-- App 3: Application part (2/3) -->
+                <rect x="35" y="450" width="110" height="45" rx="6" class="component-box app"/>
+                <text x="90" y="478" class="component-label-tiny">Application 3</text>
+                <!-- App 3: Argus API part (1/3) -->
+                <rect x="145" y="450" width="55" height="45" rx="6" class="component-box argus-api"/>
+                <text x="172" y="468" class="component-label-micro">Argus</text>
+                <text x="172" y="483" class="component-label-micro">API</text>
+
+                <!-- ARGUS (Center) -->
+                <rect x="360" y="60" width="160" height="90" rx="10" class="component-box argus"/>
+                <text x="440" y="97" class="component-label argus-label">ARGUS</text>
+                <text x="440" y="120" class="component-sublabel">Coordinator</text>
+
+                <!-- Infrastructure Components Box -->
+                <rect x="300" y="300" width="420" height="200" rx="10" class="infra-box"/>
+                <text x="320" y="325" class="cluster-label">Infrastructure Components</text>
+
+                <!-- OTEL Collector -->
+                <rect x="320" y="350" width="90" height="60" rx="6" class="component-box collector"/>
+                <text x="365" y="375" class="component-label-tiny">OTEL</text>
+                <text x="365" y="390" class="component-label-tiny">Collector</text>
+
+                <!-- Elasticsearch -->
+                <rect x="460" y="335" width="90" height="45" rx="6" class="component-box infra"/>
+                <text x="505" y="362" class="component-label-tiny">Elasticsearch</text>
+
+                <!-- Jaeger -->
+                <rect x="460" y="420" width="90" height="45" rx="6" class="component-box infra"/>
+                <text x="505" y="447" class="component-label-small">Jaeger</text>
+
+                <!-- Kibana -->
+                <rect x="600" y="335" width="90" height="45" rx="6" class="component-box infra"/>
+                <text x="645" y="362" class="component-label-small">Kibana</text>
+
+                <!-- Grafana -->
+                <rect x="600" y="420" width="90" height="45" rx="6" class="component-box infra"/>
+                <text x="645" y="447" class="component-label-small">Grafana</text>
+
+                <!-- NOC -->
+                <rect x="640" y="40" width="120" height="50" rx="8" class="component-box noc"/>
+                <text x="700" y="70" class="component-label">NOC</text>
+
+                <!-- NAS -->
+                <rect x="640" y="110" width="120" height="50" rx="8" class="component-box nas"/>
+                <text x="700" y="132" class="component-label-small">NAS</text>
+                <text x="700" y="148" class="component-sublabel">(Heartbeat File)</text>
+
+                <!-- SHOB -->
+                <rect x="800" y="110" width="120" height="50" rx="8" class="component-box shob"/>
+                <text x="860" y="132" class="component-label-small" style="fill: #a855f7;">SHOB</text>
+                <text x="860" y="148" class="component-sublabel">(External Monitor)</text>
+
+                <!-- ========== ARROWS ========== -->
+
+                <!-- K8s API Server -> Argus -->
+                <line x1="165" y1="85" x2="355" y2="90" class="arrow arrow-blue" marker-end="url(#arrowhead)"/>
+                <text x="250" y="75" class="arrow-label">K8s Health</text>
+
+                <!-- KSM -> Prometheus -->
+                <line x1="100" y1="180" x2="100" y2="205" class="arrow arrow-green" marker-end="url(#arrowhead-green)"/>
+                <text x="115" y="195" class="arrow-label-small">metrics</text>
+
+                <!-- Prometheus -> Argus (Watchdog) -->
+                <line x1="165" y1="225" x2="355" y2="120" class="arrow arrow-orange" marker-end="url(#arrowhead-orange)"/>
+                <text x="250" y="180" class="arrow-label">Watchdog</text>
+
+                <!-- Prometheus -> Argus (Alerts) -->
+                <line x1="165" y1="245" x2="355" y2="140" class="arrow arrow-orange" marker-end="url(#arrowhead-orange)"/>
+                <text x="250" y="205" class="arrow-label">Alerts</text>
+
+                <!-- Argus -> NOC (Alerts) -->
+                <line x1="520" y1="85" x2="635" y2="60" class="arrow arrow-blue" marker-end="url(#arrowhead)"/>
+                <text x="565" y="60" class="arrow-label">Alerts</text>
+
+                <!-- Argus -> NOC (Heartbeat) -->
+                <line x1="520" y1="100" x2="635" y2="75" class="arrow arrow-blue" marker-end="url(#arrowhead)"/>
+                <text x="565" y="105" class="arrow-label">Heartbeat</text>
+
+                <!-- Argus -> NAS -->
+                <line x1="520" y1="125" x2="635" y2="130" class="arrow arrow-blue" marker-end="url(#arrowhead)"/>
+                <text x="560" y="145" class="arrow-label">Heartbeat File</text>
+
+                <!-- SHOB -> NAS -->
+                <line x1="795" y1="135" x2="765" y2="135" class="arrow" style="stroke: #a855f7;" marker-end="url(#arrowhead-shob)"/>
+                <text x="780" y="125" class="arrow-label" style="fill: #a855f7;">reads</text>
+
+                <!-- Prometheus <- Infrastructure Components (scrape) -->
+                <path d="M 165 250 Q 230 300 295 345" class="arrow arrow-purple" marker-end="url(#arrowhead-purple)"/>
+                <text x="215" y="310" class="arrow-label">scrape</text>
+
+                <!-- Argus API 1 -> OTEL Collector -->
+                <line x1="200" y1="362" x2="315" y2="370" class="arrow arrow-purple" marker-end="url(#arrowhead-purple)"/>
+
+                <!-- Argus API 2 -> OTEL Collector -->
+                <line x1="200" y1="417" x2="315" y2="385" class="arrow arrow-purple" marker-end="url(#arrowhead-purple)"/>
+
+                <!-- Argus API 3 -> OTEL Collector -->
+                <line x1="200" y1="472" x2="315" y2="400" class="arrow arrow-purple" marker-end="url(#arrowhead-purple)"/>
+
+                <!-- Argus -> OTEL Collector -->
+                <line x1="440" y1="150" x2="365" y2="345" class="arrow arrow-purple" marker-end="url(#arrowhead-purple)"/>
+                <text x="415" y="230" class="arrow-label">Logs</text>
+                <text x="415" y="245" class="arrow-label">Metrics</text>
+                <text x="415" y="260" class="arrow-label">Traces</text>
+
+                <!-- OTEL Collector -> Elasticsearch -->
+                <line x1="410" y1="365" x2="455" y2="358" class="arrow arrow-purple" marker-end="url(#arrowhead-purple)"/>
+                <text x="425" y="350" class="arrow-label-small">logs</text>
+
+                <!-- OTEL Collector -> Jaeger -->
+                <line x1="410" y1="395" x2="455" y2="435" class="arrow arrow-purple" marker-end="url(#arrowhead-purple)"/>
+                <text x="420" y="425" class="arrow-label-small">traces</text>
+
+                <!-- Elasticsearch -> Kibana -->
+                <line x1="550" y1="357" x2="595" y2="357" class="arrow arrow-blue" marker-end="url(#arrowhead)"/>
+
+                <!-- Legend (lower right corner) -->
+                <rect x="730" y="510" width="150" height="80" rx="8" class="legend-box"/>
+                <text x="745" y="530" class="legend-title">Data Flow Legend</text>
+                <line x1="745" y1="547" x2="770" y2="547" class="arrow arrow-blue"/>
+                <text x="780" y="551" class="legend-text">Control / Alerts</text>
+                <line x1="745" y1="565" x2="770" y2="565" class="arrow arrow-orange"/>
+                <text x="780" y="569" class="legend-text">Prometheus</text>
+                <line x1="745" y1="583" x2="770" y2="583" class="arrow arrow-purple"/>
+                <text x="780" y="587" class="legend-text">Telemetry</text>
+            </svg>
+        </div>
+    </div>
+
+
+    <!-- Slide 4: Components Flow Diagram -->
+    <div class="slide slide-4">
+        <div class="slide-header">
+            <h2>Argus Components</h2>
+            <div class="header-line"></div>
+        </div>
+        <div class="architecture-container">
+            <svg viewBox="0 0 900 580" class="arch-svg">
+                <!-- Arrow Markers -->
+                <defs>
+                    <marker id="arrow-blue4" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#7aa2f7"/>
+                    </marker>
+                    <marker id="arrow-green4" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#86efac"/>
+                    </marker>
+                    <marker id="arrow-orange4" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#ff9e64"/>
+                    </marker>
+                    <marker id="arrow-purple4" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#bb9af7"/>
+                    </marker>
+                </defs>
+
+                <!-- ========== ROW 1: CENTRAL TIMER ========== -->
+                <rect x="30" y="20" width="840" height="55" rx="10" style="fill: rgba(187, 154, 247, 0.15); stroke: #bb9af7; stroke-width: 3;"/>
+                <text x="450" y="45" style="fill: #bb9af7; font-size: 18px; font-weight: 700; text-anchor: middle;">CENTRAL TIMER</text>
+                <text x="450" y="62" style="fill: #a0a0b0; font-size: 10px; text-anchor: middle;">1-second tick • Registers & triggers callbacks • Manages grace period</text>
+
+                <!-- Arrow down -->
+                <line x1="450" y1="75" x2="450" y2="88" style="stroke: #bb9af7; stroke-width: 2;" marker-end="url(#arrow-purple4)"/>
+
+                <!-- ========== ROW 2: CALLBACKS ========== -->
+                <rect x="30" y="95" width="840" height="60" rx="10" style="fill: rgba(122, 162, 247, 0.08); stroke: #7aa2f7; stroke-width: 2; stroke-dasharray: 5 3;"/>
+                <text x="50" y="115" style="fill: #7aa2f7; font-size: 12px; font-weight: 600;">CALLBACKS</text>
+
+                <rect x="130" y="105" width="100" height="38" rx="6" style="fill: rgba(125, 211, 252, 0.2); stroke: #7dd3fc; stroke-width: 2;"/>
+                <text x="180" y="129" class="component-label-small">K8sPolling</text>
+
+                <rect x="240" y="105" width="100" height="38" rx="6" style="fill: rgba(122, 162, 247, 0.2); stroke: #7aa2f7; stroke-width: 2;"/>
+                <text x="290" y="129" class="component-label-small">NocSnapshot</text>
+
+                <rect x="350" y="105" width="100" height="38" rx="6" style="fill: rgba(251, 191, 36, 0.2); stroke: #fbbf24; stroke-width: 2;"/>
+                <text x="400" y="129" class="component-label-small">Heartbeat</text>
+
+                <rect x="460" y="105" width="100" height="38" rx="6" style="fill: rgba(255, 158, 100, 0.2); stroke: #ff9e64; stroke-width: 2;"/>
+                <text x="510" y="129" class="component-label-small">Watchdog</text>
+
+                <rect x="570" y="105" width="100" height="38" rx="6" style="fill: rgba(52, 211, 153, 0.2); stroke: #34d399; stroke-width: 2;"/>
+                <text x="620" y="129" class="component-label-small">LeaderElection</text>
+
+                <rect x="680" y="105" width="100" height="38" rx="6" style="fill: rgba(134, 239, 172, 0.2); stroke: #86efac; stroke-width: 2;"/>
+                <text x="730" y="129" class="component-label-small">StatusFS</text>
+
+                <!-- Arrow down -->
+                <line x1="450" y1="155" x2="450" y2="168" style="stroke: #86efac; stroke-width: 2;" marker-end="url(#arrow-green4)"/>
+                <text x="520" y="165" style="fill: #86efac; font-size: 10px;">stamp</text>
+
+                <!-- ========== ROW 3: LIVENESS VECTOR ========== -->
+                <rect x="30" y="175" width="840" height="50" rx="10" style="fill: rgba(134, 239, 172, 0.15); stroke: #86efac; stroke-width: 3;"/>
+                <text x="450" y="198" style="fill: #86efac; font-size: 16px; font-weight: 700; text-anchor: middle;">LIVENESS VECTOR</text>
+                <text x="450" y="215" style="fill: #a0a0b0; font-size: 10px; text-anchor: middle;">Tracks last execution tick per callback • Tolerance: 2× interval • Returns unhealthy list</text>
+
+                <!-- ========== ROW 4: COORDINATOR + RESTART TRACKER + METRICS ========== -->
+                <rect x="30" y="240" width="280" height="75" rx="10" style="fill: rgba(255, 158, 100, 0.15); stroke: #ff9e64; stroke-width: 3;"/>
+                <text x="170" y="268" style="fill: #ff9e64; font-size: 16px; font-weight: 700; text-anchor: middle;">COORDINATOR</text>
+                <text x="170" y="286" style="fill: #a0a0b0; font-size: 10px; text-anchor: middle;">Orchestrates K8s polling & alerts</text>
+                <text x="170" y="300" style="fill: #a0a0b0; font-size: 10px; text-anchor: middle;">Registers callbacks • Filters by platform</text>
+
+                <rect x="320" y="240" width="250" height="75" rx="10" style="fill: rgba(248, 113, 113, 0.15); stroke: #f87171; stroke-width: 3;"/>
+                <text x="445" y="268" style="fill: #f87171; font-size: 16px; font-weight: 700; text-anchor: middle;">RESTART TRACKER</text>
+                <text x="445" y="286" style="fill: #a0a0b0; font-size: 10px; text-anchor: middle;">Sliding window for pod restarts</text>
+                <text x="445" y="300" style="fill: #a0a0b0; font-size: 10px; text-anchor: middle;">Detects restart storms • Grace-aware</text>
+
+                <rect x="580" y="240" width="290" height="75" rx="10" style="fill: rgba(125, 211, 252, 0.15); stroke: #7dd3fc; stroke-width: 3;"/>
+                <text x="725" y="268" style="fill: #7dd3fc; font-size: 16px; font-weight: 700; text-anchor: middle;">METRICS</text>
+                <text x="725" y="286" style="fill: #a0a0b0; font-size: 10px; text-anchor: middle;">OpenTelemetry-based metrics</text>
+                <text x="725" y="300" style="fill: #a0a0b0; font-size: 10px; text-anchor: middle;">Ingestion • Lifecycle • NOC • Health</text>
+
+                <!-- ========== ROW 5: ALERTS VECTOR (FULL WIDTH) ========== -->
+                <rect x="30" y="330" width="840" height="70" rx="10" style="fill: rgba(122, 162, 247, 0.2); stroke: #7aa2f7; stroke-width: 3;"/>
+                <text x="450" y="358" style="fill: #7aa2f7; font-size: 18px; font-weight: 700; text-anchor: middle;">ALERTS VECTOR</text>
+                <text x="450" y="378" style="fill: #a0a0b0; font-size: 11px; text-anchor: middle;">In-memory storage • Priority-ordered • TTL-based cleanup • CREATE / CANCEL status</text>
+                <text x="450" y="393" style="fill: #7aa2f7; font-size: 10px; text-anchor: middle;">Sources: K8s Layer, Prometheus Push, Watchdog</text>
+
+                <!-- Arrow down -->
+                <line x1="450" y1="400" x2="450" y2="418" style="stroke: #7aa2f7; stroke-width: 2;" marker-end="url(#arrow-blue4)"/>
+
+                <!-- ========== ROW 6: PIPELINE COMPONENTS ========== -->
+                <rect x="30" y="425" width="840" height="135" rx="10" style="fill: rgba(56, 189, 248, 0.05); stroke: #0ea5e9; stroke-width: 2; stroke-dasharray: 5 3;"/>
+                <text x="50" y="448" style="fill: #0ea5e9; font-size: 12px; font-weight: 600;">ALERT PIPELINE</text>
+
+                <!-- Suppression Cache -->
+                <rect x="50" y="460" width="250" height="85" rx="8" style="fill: rgba(251, 191, 36, 0.2); stroke: #fbbf24; stroke-width: 3;"/>
+                <text x="175" y="488" style="fill: #ffffff; font-size: 15px; font-weight: 600; text-anchor: middle;">Suppression Cache</text>
+                <text x="175" y="508" style="fill: #a0a0b0; font-size: 10px; text-anchor: middle;">Fingerprint-based • Time-window filtering</text>
+                <text x="175" y="523" style="fill: #a0a0b0; font-size: 10px; text-anchor: middle;">Prevents duplicate NOC calls</text>
+                <text x="175" y="538" style="fill: #fbbf24; font-size: 9px; text-anchor: middle;">key: fingerprint:status</text>
+
+                <!-- Arrow -->
+                <line x1="300" y1="502" x2="325" y2="502" style="stroke: #fbbf24; stroke-width: 3;" marker-end="url(#arrow-orange4)"/>
+
+                <!-- NOC Decision Queue -->
+                <rect x="335" y="460" width="250" height="85" rx="8" style="fill: rgba(52, 211, 153, 0.2); stroke: #34d399; stroke-width: 3;"/>
+                <text x="460" y="488" style="fill: #ffffff; font-size: 15px; font-weight: 600; text-anchor: middle;">NOC Decision Queue</text>
+                <text x="460" y="508" style="fill: #a0a0b0; font-size: 10px; text-anchor: middle;">Async processing • Channel&lt;NocDecision&gt;</text>
+                <text x="460" y="523" style="fill: #a0a0b0; font-size: 10px; text-anchor: middle;">Handles CREATE & CANCEL decisions</text>
+                <text x="460" y="538" style="fill: #34d399; font-size: 9px; text-anchor: middle;">background consumer</text>
+
+                <!-- Arrow -->
+                <line x1="585" y1="502" x2="610" y2="502" style="stroke: #34d399; stroke-width: 3;" marker-end="url(#arrow-green4)"/>
+
+                <!-- NOC Health Service -->
+                <rect x="620" y="460" width="240" height="85" rx="8" style="fill: rgba(248, 113, 113, 0.2); stroke: #f87171; stroke-width: 3;"/>
+                <text x="740" y="488" style="fill: #ffffff; font-size: 15px; font-weight: 600; text-anchor: middle;">NOC Health Service</text>
+                <text x="740" y="508" style="fill: #a0a0b0; font-size: 10px; text-anchor: middle;">Circuit breaker pattern</text>
+                <text x="740" y="523" style="fill: #a0a0b0; font-size: 10px; text-anchor: middle;">Tracks consecutive failures</text>
+                <text x="740" y="538" style="fill: #f87171; font-size: 9px; text-anchor: middle;">controls heartbeat output</text>
+
+            </svg>
+        </div>
+    </div>
+
+    <!-- Slide 5: Argus Component Details -->
+    <div class="slide slide-5">
+        <div class="slide-header">
+            <h2>Argus Component Details</h2>
+            <div class="header-line"></div>
+        </div>
+        <div class="components-detail-container" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding: 0 20px;">
+
+            <!-- Left Column -->
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+
+                <!-- Central Timer -->
+                <div style="background: rgba(187, 154, 247, 0.15); border: 2px solid #bb9af7; border-radius: 8px; padding: 10px;">
+                    <div style="color: #bb9af7; font-size: 14px; font-weight: 700; margin-bottom: 6px;">CENTRAL TIMER</div>
+                    <ul style="color: #c0c0c0; font-size: 11px; margin: 0; padding-left: 16px; line-height: 1.5;">
+                        <li>1-second tick engine, maintains tick counter + timestamp</li>
+                        <li>Registers callbacks with configurable intervals</li>
+                        <li>Grace period skips "grace-aware" callbacks</li>
+                        <li>Generates correlation ID per tick for tracing</li>
+                    </ul>
+                </div>
+
+                <!-- Liveness Vector -->
+                <div style="background: rgba(134, 239, 172, 0.15); border: 2px solid #86efac; border-radius: 8px; padding: 10px;">
+                    <div style="color: #86efac; font-size: 14px; font-weight: 700; margin-bottom: 6px;">LIVENESS VECTOR</div>
+                    <ul style="color: #c0c0c0; font-size: 11px; margin: 0; padding-left: 16px; line-height: 1.5;">
+                        <li>Tracks callback health via tick-based stamping</li>
+                        <li>Tolerance: 2× expected interval</li>
+                        <li>Exception = no stamp = detected as unhealthy</li>
+                    </ul>
+                </div>
+
+                <!-- Coordinator -->
+                <div style="background: rgba(255, 158, 100, 0.15); border: 2px solid #ff9e64; border-radius: 8px; padding: 10px;">
+                    <div style="color: #ff9e64; font-size: 14px; font-weight: 700; margin-bottom: 6px;">COORDINATOR</div>
+                    <ul style="color: #c0c0c0; font-size: 11px; margin: 0; padding-left: 16px; line-height: 1.5;">
+                        <li>Orchestrates K8sPolling & NocSnapshot callbacks</li>
+                        <li>Filters Prometheus alerts by <code style="color: #7aa2f7;">platform="argus"</code></li>
+                        <li>Routes watchdog alerts, generates execution IDs</li>
+                    </ul>
+                </div>
+
+                <!-- Restart Tracker -->
+                <div style="background: rgba(248, 113, 113, 0.15); border: 2px solid #f87171; border-radius: 8px; padding: 10px;">
+                    <div style="color: #f87171; font-size: 14px; font-weight: 700; margin-bottom: 6px;">RESTART TRACKER</div>
+                    <ul style="color: #c0c0c0; font-size: 11px; margin: 0; padding-left: 16px; line-height: 1.5;">
+                        <li>Sliding window detects pod restart storms</li>
+                        <li>Reports stable during grace period</li>
+                        <li>Used by K8s Layer for pod health checks</li>
+                    </ul>
+                </div>
+
+                <!-- Metrics -->
+                <div style="background: rgba(125, 211, 252, 0.15); border: 2px solid #7dd3fc; border-radius: 8px; padding: 10px;">
+                    <div style="color: #7dd3fc; font-size: 14px; font-weight: 700; margin-bottom: 6px;">METRICS</div>
+                    <ul style="color: #c0c0c0; font-size: 11px; margin: 0; padding-left: 16px; line-height: 1.5;">
+                        <li>OpenTelemetry-based: ingestion, lifecycle, NOC, health</li>
+                        <li>Exported via OTel Collector</li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <!-- Right Column -->
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+
+                <!-- Alerts Vector -->
+                <div style="background: rgba(122, 162, 247, 0.2); border: 2px solid #7aa2f7; border-radius: 8px; padding: 10px;">
+                    <div style="color: #7aa2f7; font-size: 14px; font-weight: 700; margin-bottom: 6px;">ALERTS VECTOR</div>
+                    <ul style="color: #c0c0c0; font-size: 11px; margin: 0; padding-left: 16px; line-height: 1.5;">
+                        <li>In-memory, priority-ordered, fingerprint-keyed</li>
+                        <li>CREATE/CANCEL status with TTL-based cleanup</li>
+                        <li>Updated asynchronously by all alert sources</li>
+                    </ul>
+                </div>
+
+                <!-- Suppression Cache -->
+                <div style="background: rgba(251, 191, 36, 0.15); border: 2px solid #fbbf24; border-radius: 8px; padding: 10px;">
+                    <div style="color: #fbbf24; font-size: 14px; font-weight: 700; margin-bottom: 6px;">SUPPRESSION CACHE</div>
+                    <ul style="color: #c0c0c0; font-size: 11px; margin: 0; padding-left: 16px; line-height: 1.5;">
+                        <li>Prevents duplicate NOC via <code style="color: #fbbf24;">fingerprint:status</code></li>
+                        <li>Configurable time windows (e.g., "2m", "5m")</li>
+                        <li>Failed NOC = unmarked for immediate retry</li>
+                    </ul>
+                </div>
+
+                <!-- NOC Decision Queue -->
+                <div style="background: rgba(52, 211, 153, 0.15); border: 2px solid #34d399; border-radius: 8px; padding: 10px;">
+                    <div style="color: #34d399; font-size: 14px; font-weight: 700; margin-bottom: 6px;">NOC DECISION QUEUE</div>
+                    <ul style="color: #c0c0c0; font-size: 11px; margin: 0; padding-left: 16px; line-height: 1.5;">
+                        <li>Async queue with background consumer</li>
+                        <li>Leader sends HTTP, follower verifies</li>
+                        <li>Removes CANCEL alerts from vector on success</li>
+                    </ul>
+                </div>
+
+                <!-- NOC Health Service -->
+                <div style="background: rgba(248, 113, 113, 0.15); border: 2px solid #f87171; border-radius: 8px; padding: 10px;">
+                    <div style="color: #f87171; font-size: 14px; font-weight: 700; margin-bottom: 6px;">NOC HEALTH SERVICE</div>
+                    <ul style="color: #c0c0c0; font-size: 11px; margin: 0; padding-left: 16px; line-height: 1.5;">
+                        <li>Circuit breaker: tracks consecutive NOC failures</li>
+                        <li>Trips at threshold → stops file heartbeat</li>
+                        <li>Resets on any successful NOC call</li>
+                    </ul>
+                </div>
+
+                <!-- Callbacks Table -->
+                <div style="background: rgba(122, 162, 247, 0.08); border: 2px solid #3d59a1; border-radius: 8px; padding: 10px;">
+                    <div style="color: #7aa2f7; font-size: 14px; font-weight: 700; margin-bottom: 8px;">CALLBACKS</div>
+                    <table style="width: 100%; font-size: 10px; border-collapse: collapse;">
+                        <tr style="color: #a0a0a0;">
+                            <th style="text-align: left; padding: 3px 6px; border-bottom: 1px solid #3d59a1;">Name</th>
+                            <th style="text-align: center; padding: 3px 6px; border-bottom: 1px solid #3d59a1;">Grace</th>
+                            <th style="text-align: left; padding: 3px 6px; border-bottom: 1px solid #3d59a1;">Purpose</th>
+                        </tr>
+                        <tr>
+                            <td style="color: #7dd3fc; padding: 3px 6px;">K8sPolling</td>
+                            <td style="color: #f87171; text-align: center; padding: 3px 6px;">✗</td>
+                            <td style="color: #c0c0c0; padding: 3px 6px;">Polls K8s for pod health</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #7aa2f7; padding: 3px 6px;">NocSnapshot</td>
+                            <td style="color: #86efac; text-align: center; padding: 3px 6px;">✓</td>
+                            <td style="color: #c0c0c0; padding: 3px 6px;">Snapshots vector, enqueues decisions</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #fbbf24; padding: 3px 6px;">Heartbeat</td>
+                            <td style="color: #f87171; text-align: center; padding: 3px 6px;">✗</td>
+                            <td style="color: #c0c0c0; padding: 3px 6px;">Liveness check, NOC HTTP, file write</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #ff9e64; padding: 3px 6px;">Watchdog</td>
+                            <td style="color: #86efac; text-align: center; padding: 3px 6px;">✓</td>
+                            <td style="color: #c0c0c0; padding: 3px 6px;">Detects missing Prometheus heartbeats</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #34d399; padding: 3px 6px;">LeaderElection</td>
+                            <td style="color: #f87171; text-align: center; padding: 3px 6px;">✗</td>
+                            <td style="color: #c0c0c0; padding: 3px 6px;">Renews K8s Lease</td>
+                        </tr>
+                        <tr>
+                            <td style="color: #86efac; padding: 3px 6px;">StatusFS</td>
+                            <td style="color: #f87171; text-align: center; padding: 3px 6px;">✗</td>
+                            <td style="color: #c0c0c0; padding: 3px 6px;">Checks heartbeat path accessibility</td>
+                        </tr>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: HA Leader-Follower Model -->
+    <div class="slide slide-6">
+        <div class="slide-header">
+            <h2>HA: Leader-Follower Model</h2>
+            <div class="header-line"></div>
+        </div>
+        <div class="ha-container">
+            <svg viewBox="0 0 900 520" xmlns="http://www.w3.org/2000/svg">
+
+                <!-- ========== TOP SECTION: Architecture ========== -->
+
+                <!-- Leader Pod -->
+                <rect x="80" y="20" width="180" height="150" rx="10" fill="rgba(52, 211, 153, 0.2)" stroke="#34d399" stroke-width="2"/>
+                <text x="170" y="42" style="fill: #34d399; font-size: 16px; font-weight: 700; text-anchor: middle;">LEADER</text>
+                <text x="170" y="58" style="fill: #a0a0b0; font-size: 11px; text-anchor: middle;">Pod 1</text>
+                <rect x="100" y="68" width="140" height="92" rx="6" fill="rgba(30, 30, 40, 0.8)" stroke="#3d3d50" stroke-width="1"/>
+                <text x="120" y="86" style="fill: #86efac; font-size: 10px;">K8s:</text>
+                <text x="180" y="86" style="fill: #34d399; font-size: 10px;">✓</text>
+                <text x="120" y="101" style="fill: #86efac; font-size: 10px;">Watchdog:</text>
+                <text x="180" y="101" style="fill: #34d399; font-size: 10px;">✓</text>
+                <text x="120" y="116" style="fill: #86efac; font-size: 10px;">Alerts:</text>
+                <text x="180" y="116" style="fill: #34d399; font-size: 10px;">✓</text>
+                <text x="120" y="131" style="fill: #86efac; font-size: 10px;">NOC:</text>
+                <text x="180" y="131" style="fill: #34d399; font-size: 10px;">✓ send+verify</text>
+                <text x="120" y="146" style="fill: #86efac; font-size: 10px;">File:</text>
+                <text x="180" y="146" style="fill: #34d399; font-size: 10px;">✓ writes</text>
+
+                <!-- Follower Pod 2 -->
+                <rect x="360" y="20" width="180" height="150" rx="10" fill="rgba(122, 162, 247, 0.15)" stroke="#7aa2f7" stroke-width="2"/>
+                <text x="450" y="42" style="fill: #7aa2f7; font-size: 16px; font-weight: 700; text-anchor: middle;">FOLLOWER</text>
+                <text x="450" y="58" style="fill: #a0a0b0; font-size: 11px; text-anchor: middle;">Pod 2</text>
+                <rect x="380" y="68" width="140" height="92" rx="6" fill="rgba(30, 30, 40, 0.8)" stroke="#3d3d50" stroke-width="1"/>
+                <text x="400" y="86" style="fill: #7aa2f7; font-size: 10px;">K8s:</text>
+                <text x="460" y="86" style="fill: #34d399; font-size: 10px;">✓</text>
+                <text x="400" y="101" style="fill: #7aa2f7; font-size: 10px;">Watchdog:</text>
+                <text x="460" y="101" style="fill: #34d399; font-size: 10px;">✓</text>
+                <text x="400" y="116" style="fill: #7aa2f7; font-size: 10px;">Alerts:</text>
+                <text x="460" y="116" style="fill: #34d399; font-size: 10px;">✓</text>
+                <text x="400" y="131" style="fill: #7aa2f7; font-size: 10px;">NOC:</text>
+                <text x="460" y="131" style="fill: #34d399; font-size: 10px;">✓ only verify</text>
+                <text x="400" y="146" style="fill: #7aa2f7; font-size: 10px;">File:</text>
+                <text x="460" y="146" style="fill: #f87171; font-size: 10px;">✗ skip</text>
+
+                <!-- Follower Pod 3 -->
+                <rect x="640" y="20" width="180" height="150" rx="10" fill="rgba(122, 162, 247, 0.15)" stroke="#7aa2f7" stroke-width="2"/>
+                <text x="730" y="42" style="fill: #7aa2f7; font-size: 16px; font-weight: 700; text-anchor: middle;">FOLLOWER</text>
+                <text x="730" y="58" style="fill: #a0a0b0; font-size: 11px; text-anchor: middle;">Pod 3</text>
+                <rect x="660" y="68" width="140" height="92" rx="6" fill="rgba(30, 30, 40, 0.8)" stroke="#3d3d50" stroke-width="1"/>
+                <text x="680" y="86" style="fill: #7aa2f7; font-size: 10px;">K8s:</text>
+                <text x="740" y="86" style="fill: #34d399; font-size: 10px;">✓</text>
+                <text x="680" y="101" style="fill: #7aa2f7; font-size: 10px;">Watchdog:</text>
+                <text x="740" y="101" style="fill: #34d399; font-size: 10px;">✓</text>
+                <text x="680" y="116" style="fill: #7aa2f7; font-size: 10px;">Alerts:</text>
+                <text x="740" y="116" style="fill: #34d399; font-size: 10px;">✓</text>
+                <text x="680" y="131" style="fill: #7aa2f7; font-size: 10px;">NOC:</text>
+                <text x="740" y="131" style="fill: #34d399; font-size: 10px;">✓ only verify</text>
+                <text x="680" y="146" style="fill: #7aa2f7; font-size: 10px;">File:</text>
+                <text x="740" y="146" style="fill: #f87171; font-size: 10px;">✗ skip</text>
+
+                <!-- Arrows to Lease -->
+                <line x1="170" y1="170" x2="170" y2="200" stroke="#34d399" stroke-width="2" marker-end="url(#arrow-green-ha)"/>
+                <text x="175" y="190" style="fill: #34d399; font-size: 9px;">renew</text>
+
+                <line x1="450" y1="170" x2="450" y2="200" stroke="#7aa2f7" stroke-width="2" stroke-dasharray="4,2" marker-end="url(#arrow-blue-ha)"/>
+                <text x="455" y="190" style="fill: #7aa2f7; font-size: 9px;">watch</text>
+
+                <line x1="730" y1="170" x2="730" y2="200" stroke="#7aa2f7" stroke-width="2" stroke-dasharray="4,2" marker-end="url(#arrow-blue-ha)"/>
+                <text x="735" y="190" style="fill: #7aa2f7; font-size: 9px;">watch</text>
+
+                <!-- K8s Lease Object -->
+                <rect x="80" y="205" width="740" height="45" rx="8" fill="rgba(251, 191, 36, 0.15)" stroke="#fbbf24" stroke-width="2"/>
+                <text x="450" y="223" style="fill: #fbbf24; font-size: 13px; font-weight: 600; text-anchor: middle;">K8s Lease Object</text>
+                <text x="450" y="240" style="fill: #a0a0b0; font-size: 10px; text-anchor: middle;">coordination.k8s.io/v1</text>
+
+                <!-- Arrow Markers -->
+                <defs>
+                    <marker id="arrow-green-ha" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                        <polygon points="0 0, 8 3, 0 6" fill="#34d399"/>
+                    </marker>
+                    <marker id="arrow-blue-ha" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                        <polygon points="0 0, 8 3, 0 6" fill="#7aa2f7"/>
+                    </marker>
+                    <marker id="arrow-red-ha" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                        <polygon points="0 0, 8 3, 0 6" fill="#f87171"/>
+                    </marker>
+                </defs>
+
+                <!-- ========== BOTTOM SECTION: Timeline ========== -->
+
+                <!-- Timeline Title -->
+                <text x="450" y="275" style="fill: #e0e0e0; font-size: 13px; font-weight: 600; text-anchor: middle;">Election Flow Timeline</text>
+
+                <!-- Time Arrow -->
+                <line x1="60" y1="295" x2="860" y2="295" stroke="#505060" stroke-width="2" marker-end="url(#arrow-time)"/>
+                <text x="870" y="299" style="fill: #707080; font-size: 10px;">TIME</text>
+                <defs>
+                    <marker id="arrow-time" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                        <polygon points="0 0, 8 3, 0 6" fill="#505060"/>
+                    </marker>
+                </defs>
+
+                <!-- Time Points -->
+                <line x1="120" y1="290" x2="120" y2="470" stroke="#3d3d50" stroke-width="1" stroke-dasharray="3,3"/>
+                <text x="120" y="287" style="fill: #808090; font-size: 10px; text-anchor: middle;">T0</text>
+
+                <line x1="280" y1="290" x2="280" y2="470" stroke="#3d3d50" stroke-width="1" stroke-dasharray="3,3"/>
+                <text x="280" y="287" style="fill: #808090; font-size: 10px; text-anchor: middle;">T1</text>
+
+                <line x1="440" y1="290" x2="440" y2="470" stroke="#3d3d50" stroke-width="1" stroke-dasharray="3,3"/>
+                <text x="440" y="287" style="fill: #808090; font-size: 10px; text-anchor: middle;">T2</text>
+
+                <line x1="600" y1="290" x2="600" y2="470" stroke="#3d3d50" stroke-width="1" stroke-dasharray="3,3"/>
+                <text x="600" y="287" style="fill: #808090; font-size: 10px; text-anchor: middle;">T3</text>
+
+                <line x1="760" y1="290" x2="760" y2="470" stroke="#3d3d50" stroke-width="1" stroke-dasharray="3,3"/>
+                <text x="760" y="287" style="fill: #808090; font-size: 10px; text-anchor: middle;">T4</text>
+
+                <!-- Pod Labels -->
+                <text x="50" y="330" style="fill: #a0a0b0; font-size: 11px; text-anchor: end;">POD 1</text>
+                <text x="50" y="385" style="fill: #a0a0b0; font-size: 11px; text-anchor: end;">POD 2</text>
+                <text x="50" y="440" style="fill: #a0a0b0; font-size: 11px; text-anchor: end;">POD 3</text>
+
+                <!-- POD 1 Timeline (Leader then Crash) -->
+                <line x1="120" y1="330" x2="580" y2="330" stroke="#34d399" stroke-width="4"/>
+                <circle cx="120" cy="330" r="6" fill="#34d399"/>
+                <circle cx="280" cy="330" r="5" fill="#34d399"/>
+                <circle cx="440" cy="330" r="5" fill="#34d399"/>
+                <!-- Crash X -->
+                <text x="600" y="335" style="fill: #f87171; font-size: 18px; font-weight: bold; text-anchor: middle;">✖</text>
+
+                <text x="120" y="350" style="fill: #34d399; font-size: 9px; text-anchor: middle;">Acquire</text>
+                <text x="120" y="360" style="fill: #34d399; font-size: 8px; text-anchor: middle;">→ LEADER</text>
+                <text x="280" y="350" style="fill: #a0a0b0; font-size: 9px; text-anchor: middle;">Renew</text>
+                <text x="440" y="350" style="fill: #a0a0b0; font-size: 9px; text-anchor: middle;">Renew</text>
+                <text x="600" y="350" style="fill: #f87171; font-size: 9px; text-anchor: middle;">CRASH</text>
+
+                <!-- POD 2 Timeline (Follower then Leader) -->
+                <line x1="120" y1="385" x2="580" y2="385" stroke="#7aa2f7" stroke-width="2" stroke-dasharray="6,3"/>
+                <line x1="600" y1="385" x2="840" y2="385" stroke="#34d399" stroke-width="4"/>
+                <circle cx="120" cy="385" r="4" fill="#7aa2f7" stroke="#7aa2f7"/>
+                <circle cx="280" cy="385" r="4" fill="#7aa2f7"/>
+                <circle cx="440" cy="385" r="4" fill="#7aa2f7"/>
+                <circle cx="600" cy="385" r="6" fill="#34d399"/>
+                <circle cx="760" cy="385" r="5" fill="#34d399"/>
+
+                <text x="120" y="405" style="fill: #7aa2f7; font-size: 9px; text-anchor: middle;">Watch</text>
+                <text x="600" y="405" style="fill: #34d399; font-size: 9px; text-anchor: middle;">Acquire</text>
+                <text x="600" y="415" style="fill: #34d399; font-size: 8px; text-anchor: middle;">→ LEADER</text>
+                <text x="760" y="405" style="fill: #a0a0b0; font-size: 9px; text-anchor: middle;">Renew</text>
+
+                <!-- POD 3 Timeline (Follower always) -->
+                <line x1="120" y1="440" x2="840" y2="440" stroke="#7aa2f7" stroke-width="2" stroke-dasharray="6,3"/>
+                <circle cx="120" cy="440" r="4" fill="#7aa2f7"/>
+                <circle cx="280" cy="440" r="4" fill="#7aa2f7"/>
+                <circle cx="440" cy="440" r="4" fill="#7aa2f7"/>
+                <circle cx="600" cy="440" r="4" fill="#ff9e64"/>
+                <circle cx="760" cy="440" r="4" fill="#7aa2f7"/>
+
+                <text x="120" y="460" style="fill: #7aa2f7; font-size: 9px; text-anchor: middle;">Watch</text>
+                <text x="600" y="460" style="fill: #ff9e64; font-size: 9px; text-anchor: middle;">Attempt</text>
+                <text x="600" y="470" style="fill: #ff9e64; font-size: 8px; text-anchor: middle;">(lost race)</text>
+
+                <!-- Legend -->
+                <rect x="60" y="485" width="200" height="18" rx="4" fill="rgba(30, 30, 40, 0.6)"/>
+                <line x1="70" y1="494" x2="100" y2="494" stroke="#34d399" stroke-width="3"/>
+                <text x="105" y="498" style="fill: #a0a0b0; font-size: 9px;">Leader</text>
+                <line x1="150" y1="494" x2="180" y2="494" stroke="#7aa2f7" stroke-width="2" stroke-dasharray="4,2"/>
+                <text x="185" y="498" style="fill: #a0a0b0; font-size: 9px;">Follower</text>
+                <text x="235" y="498" style="fill: #f87171; font-size: 11px;">✖</text>
+                <text x="245" y="498" style="fill: #a0a0b0; font-size: 9px;">Failure</text>
+
+            </svg>
+        </div>
+    </div>
+
+    <!-- Slide 7: Alerts Vector Flow -->
+    <div class="slide slide-7">
+        <div class="slide-header">
+            <h2>Alerts Vector Flow</h2>
+            <div class="header-line"></div>
+        </div>
+        <div class="vector-flow-container">
+            <svg viewBox="0 0 900 585" xmlns="http://www.w3.org/2000/svg">
+
+                <!-- ========== ALERT SOURCES ========== -->
+                <text x="450" y="20" style="fill: #a0a0b0; font-size: 12px; font-weight: 600; text-anchor: middle;">ALERT SOURCES</text>
+
+                <!-- K8s Layer -->
+                <rect x="60" y="30" width="140" height="45" rx="8" fill="rgba(125, 211, 252, 0.15)" stroke="#7dd3fc" stroke-width="2"/>
+                <text x="130" y="50" style="fill: #7dd3fc; font-size: 12px; font-weight: 600; text-anchor: middle;">K8s Layer</text>
+                <text x="130" y="65" style="fill: #808090; font-size: 9px; text-anchor: middle;">(polling)</text>
+
+                <!-- Watchdog -->
+                <rect x="230" y="30" width="140" height="45" rx="8" fill="rgba(255, 158, 100, 0.15)" stroke="#ff9e64" stroke-width="2"/>
+                <text x="300" y="50" style="fill: #ff9e64; font-size: 12px; font-weight: 600; text-anchor: middle;">Watchdog</text>
+                <text x="300" y="65" style="fill: #808090; font-size: 9px; text-anchor: middle;">(callback)</text>
+
+                <!-- StatusFS -->
+                <rect x="400" y="30" width="140" height="45" rx="8" fill="rgba(134, 239, 172, 0.15)" stroke="#86efac" stroke-width="2"/>
+                <text x="470" y="50" style="fill: #86efac; font-size: 12px; font-weight: 600; text-anchor: middle;">StatusFS</text>
+                <text x="470" y="65" style="fill: #808090; font-size: 9px; text-anchor: middle;">(callback)</text>
+
+                <!-- Prometheus -->
+                <rect x="570" y="30" width="140" height="45" rx="8" fill="rgba(248, 113, 113, 0.15)" stroke="#f87171" stroke-width="2"/>
+                <text x="640" y="50" style="fill: #f87171; font-size: 12px; font-weight: 600; text-anchor: middle;">Prometheus</text>
+                <text x="640" y="65" style="fill: #808090; font-size: 9px; text-anchor: middle;">(webhook)</text>
+
+                <!-- Arrows from sources -->
+                <line x1="130" y1="75" x2="130" y2="95" stroke="#7dd3fc" stroke-width="2"/>
+                <line x1="300" y1="75" x2="300" y2="95" stroke="#ff9e64" stroke-width="2"/>
+                <line x1="470" y1="75" x2="470" y2="95" stroke="#86efac" stroke-width="2"/>
+                <line x1="640" y1="75" x2="640" y2="95" stroke="#f87171" stroke-width="2"/>
+
+                <!-- Merge lines -->
+                <line x1="130" y1="95" x2="385" y2="95" stroke="#505060" stroke-width="2"/>
+                <line x1="385" y1="95" x2="640" y2="95" stroke="#505060" stroke-width="2"/>
+                <line x1="385" y1="95" x2="385" y2="110" stroke="#7aa2f7" stroke-width="2" marker-end="url(#arrow-blue-vec)"/>
+
+                <!-- ========== ALERTS VECTOR ========== -->
+                <rect x="60" y="115" width="650" height="160" rx="10" fill="rgba(122, 162, 247, 0.1)" stroke="#7aa2f7" stroke-width="2"/>
+                <text x="385" y="138" style="fill: #7aa2f7; font-size: 14px; font-weight: 700; text-anchor: middle;">ALERTS VECTOR</text>
+                <text x="385" y="155" style="fill: #808090; font-size: 10px; text-anchor: middle;">Fingerprint-keyed • Priority-ordered • CREATE/CANCEL status</text>
+
+                <!-- Priority Table -->
+                <rect x="80" y="165" width="610" height="100" rx="6" fill="rgba(30, 30, 40, 0.8)" stroke="#3d3d50" stroke-width="1"/>
+                <text x="385" y="183" style="fill: #fbbf24; font-size: 11px; font-weight: 600; text-anchor: middle;">PRIORITY TABLE (Lower Value = Higher Priority)</text>
+
+                <!-- Priority rows -->
+                <text x="120" y="203" style="fill: #f87171; font-size: 11px; font-weight: 700;">-10</text>
+                <text x="170" y="203" style="fill: #c0c0c0; font-size: 11px;">K8s API Down</text>
+                <text x="380" y="203" style="fill: #f87171; font-size: 11px; font-weight: 700;">-9</text>
+                <text x="420" y="203" style="fill: #c0c0c0; font-size: 11px;">Prometheus Pod Down</text>
+
+                <text x="120" y="223" style="fill: #ff9e64; font-size: 11px; font-weight: 700;">-8</text>
+                <text x="170" y="223" style="fill: #c0c0c0; font-size: 11px;">KSM Pod Down</text>
+                <text x="380" y="223" style="fill: #ff9e64; font-size: 11px; font-weight: 700;">-7</text>
+                <text x="420" y="223" style="fill: #c0c0c0; font-size: 11px;">Watchdog Expired</text>
+
+                <text x="120" y="243" style="fill: #fbbf24; font-size: 11px; font-weight: 700;">-6</text>
+                <text x="170" y="243" style="fill: #c0c0c0; font-size: 11px;">StatusFS Down</text>
+                <text x="380" y="243" style="fill: #86efac; font-size: 11px; font-weight: 700;">0+</text>
+                <text x="420" y="243" style="fill: #c0c0c0; font-size: 11px;">Prometheus Alerts (from label)</text>
+
+                <!-- Highest priority indicator -->
+                <text x="100" y="260" style="fill: #f87171; font-size: 9px;">▲ highest</text>
+                <text x="600" y="260" style="fill: #86efac; font-size: 9px;">lowest ▼</text>
+
+                <!-- Arrow down -->
+                <line x1="385" y1="275" x2="385" y2="295" stroke="#7aa2f7" stroke-width="2" marker-end="url(#arrow-blue-vec)"/>
+
+                <!-- ========== NOC SNAPSHOT ========== -->
+                <rect x="60" y="300" width="650" height="85" rx="10" fill="rgba(52, 211, 153, 0.1)" stroke="#34d399" stroke-width="2"/>
+                <text x="385" y="323" style="fill: #34d399; font-size: 14px; font-weight: 700; text-anchor: middle;">NOC SNAPSHOT</text>
+                <text x="385" y="340" style="fill: #808090; font-size: 10px; text-anchor: middle;">Snapshots vector at configured interval</text>
+
+                <!-- CREATE/CANCEL boxes -->
+                <rect x="100" y="350" width="250" height="28" rx="4" fill="rgba(52, 211, 153, 0.2)" stroke="#34d399" stroke-width="1"/>
+                <text x="225" y="369" style="fill: #34d399; font-size: 10px; text-anchor: middle;">CREATE: Select ONE with lowest value</text>
+
+                <rect x="420" y="350" width="250" height="28" rx="4" fill="rgba(122, 162, 247, 0.2)" stroke="#7aa2f7" stroke-width="1"/>
+                <text x="545" y="369" style="fill: #7aa2f7; font-size: 10px; text-anchor: middle;">CANCEL: Batch all resolved alerts</text>
+
+                <!-- Arrow down -->
+                <line x1="385" y1="385" x2="385" y2="405" stroke="#34d399" stroke-width="2" marker-end="url(#arrow-green-vec)"/>
+
+                <!-- ========== NOC DECISION LOGIC ========== -->
+                <rect x="60" y="410" width="650" height="165" rx="10" fill="rgba(251, 191, 36, 0.1)" stroke="#fbbf24" stroke-width="2"/>
+                <text x="385" y="428" style="fill: #fbbf24; font-size: 13px; font-weight: 700; text-anchor: middle;">NOC DECISION LOGIC</text>
+
+                <!-- Flow steps -->
+                <rect x="80" y="438" width="145" height="32" rx="6" fill="rgba(251, 191, 36, 0.15)" stroke="#fbbf24" stroke-width="1"/>
+                <text x="152" y="451" style="fill: #fbbf24; font-size: 9px; text-anchor: middle;">1. Check Suppression</text>
+                <text x="152" y="463" style="fill: #fbbf24; font-size: 9px; text-anchor: middle;">Cache</text>
+
+                <line x1="225" y1="454" x2="250" y2="454" stroke="#fbbf24" stroke-width="1" marker-end="url(#arrow-yellow-vec)"/>
+
+                <rect x="255" y="438" width="130" height="32" rx="6" fill="rgba(251, 191, 36, 0.15)" stroke="#fbbf24" stroke-width="1"/>
+                <text x="320" y="451" style="fill: #fbbf24; font-size: 9px; text-anchor: middle;">2. Already sent?</text>
+                <text x="320" y="463" style="fill: #f87171; font-size: 9px; text-anchor: middle;">→ Skip</text>
+
+                <line x1="385" y1="454" x2="410" y2="454" stroke="#fbbf24" stroke-width="1" marker-end="url(#arrow-yellow-vec)"/>
+
+                <rect x="415" y="438" width="130" height="32" rx="6" fill="rgba(251, 191, 36, 0.15)" stroke="#fbbf24" stroke-width="1"/>
+                <text x="480" y="451" style="fill: #fbbf24; font-size: 9px; text-anchor: middle;">3. Not sent?</text>
+                <text x="480" y="463" style="fill: #34d399; font-size: 9px; text-anchor: middle;">→ Enqueue</text>
+
+                <line x1="545" y1="454" x2="570" y2="454" stroke="#fbbf24" stroke-width="1" marker-end="url(#arrow-yellow-vec)"/>
+
+                <rect x="575" y="438" width="120" height="32" rx="6" fill="rgba(52, 211, 153, 0.2)" stroke="#34d399" stroke-width="1"/>
+                <text x="635" y="451" style="fill: #34d399; font-size: 9px; text-anchor: middle;">4. Leader sends</text>
+                <text x="635" y="463" style="fill: #7aa2f7; font-size: 9px; text-anchor: middle;">Follower verifies</text>
+
+                <!-- NOC HTTP LOGIC - Phase 1 & 2 -->
+                <rect x="80" y="480" width="610" height="88" rx="8" fill="rgba(30, 30, 40, 0.9)" stroke="#505060" stroke-width="1"/>
+                <text x="385" y="498" style="fill: #c0c0d0; font-size: 11px; font-weight: 600; text-anchor: middle;">NOC HTTP PROTOCOL</text>
+
+                <!-- Phase 1 -->
+                <rect x="100" y="508" width="260" height="52" rx="6" fill="rgba(52, 211, 153, 0.12)" stroke="#34d399" stroke-width="1"/>
+                <text x="230" y="524" style="fill: #34d399; font-size: 11px; font-weight: 700; text-anchor: middle;">PHASE 1: POST</text>
+                <text x="230" y="540" style="fill: #86efac; font-size: 9px; text-anchor: middle;">Send alert to NOC endpoint</text>
+                <text x="230" y="554" style="fill: #808090; font-size: 9px; text-anchor: middle;">Response: 200 OK + ticket_id</text>
+
+                <!-- Arrow between phases -->
+                <line x1="365" y1="534" x2="405" y2="534" stroke="#7aa2f7" stroke-width="2" marker-end="url(#arrow-blue-vec)"/>
+                <text x="385" y="548" style="fill: #7aa2f7; font-size: 8px; text-anchor: middle;">then</text>
+
+                <!-- Phase 2 -->
+                <rect x="410" y="508" width="260" height="52" rx="6" fill="rgba(122, 162, 247, 0.12)" stroke="#7aa2f7" stroke-width="1"/>
+                <text x="540" y="524" style="fill: #7aa2f7; font-size: 11px; font-weight: 700; text-anchor: middle;">PHASE 2: GET</text>
+                <text x="540" y="540" style="fill: #a5b4fc; font-size: 9px; text-anchor: middle;">Verify ticket exists in NOC</text>
+                <text x="540" y="554" style="fill: #808090; font-size: 9px; text-anchor: middle;">Confirms delivery success</text>
+
+                <!-- Role indicator on right -->
+                <rect x="740" y="115" width="140" height="460" rx="10" fill="rgba(187, 154, 247, 0.08)" stroke="#bb9af7" stroke-width="1" stroke-dasharray="4,2"/>
+                <text x="810" y="140" style="fill: #bb9af7; font-size: 11px; font-weight: 600; text-anchor: middle;">ALL PODS</text>
+                <text x="810" y="155" style="fill: #808090; font-size: 9px; text-anchor: middle;">process alerts</text>
+
+                <line x1="740" y1="395" x2="880" y2="395" stroke="#3d3d50" stroke-width="1" stroke-dasharray="3,3"/>
+
+                <text x="810" y="420" style="fill: #34d399; font-size: 11px; font-weight: 600; text-anchor: middle;">LEADER ONLY</text>
+                <text x="810" y="435" style="fill: #808090; font-size: 9px; text-anchor: middle;">sends to NOC</text>
+
+                <!-- Arrow markers -->
+                <defs>
+                    <marker id="arrow-blue-vec" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                        <polygon points="0 0, 8 3, 0 6" fill="#7aa2f7"/>
+                    </marker>
+                    <marker id="arrow-green-vec" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                        <polygon points="0 0, 8 3, 0 6" fill="#34d399"/>
+                    </marker>
+                    <marker id="arrow-yellow-vec" markerWidth="6" markerHeight="5" refX="5" refY="2.5" orient="auto">
+                        <polygon points="0 0, 6 2.5, 0 5" fill="#fbbf24"/>
+                    </marker>
+                </defs>
+
+            </svg>
+        </div>
+    </div>
+
+    <!-- Slide 8: Competitive Landscape -->
+    <div class="slide slide-8">
+        <div class="slide-header">
+            <h2>Competitive Landscape — Argus Capability Matrix</h2>
+            <div class="header-line"></div>
+        </div>
+        <div class="comparison-container">
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th class="platform-col">Platform</th>
+                        <th class="feature-col">Priority-Based</th>
+                        <th class="feature-col">App Health SDK</th>
+                        <th class="feature-col">Self-Health Check</th>
+                        <th class="feature-col">Circuit Breaker</th>
+                        <th class="feature-col">E2E Alert Tracing</th>
+                        <th class="feature-col">K8s-Native HA</th>
+                        <th class="feature-col">Self-Hosted</th>
+                        <th class="pricing-col">Pricing</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="argus-row">
+                        <td class="platform-name argus">Argus</td>
+                        <td class="check" title="Numeric priority label in Prometheus rules">✓</td>
+                        <td class="check" title="ArgusApi: heartbeats, exceptions, custom metrics">✓</td>
+                        <td class="check" title="LivenessVector monitors all internal callbacks">✓</td>
+                        <td class="check" title="NocHealthService: 3 failures trips, auto-recovers">✓</td>
+                        <td class="check" title="Dual-ID: correlationId (tick) + executionId (alert lifecycle)">✓</td>
+                        <td class="check" title="Leader-Follower via K8s Leases">✓</td>
+                        <td class="check" title="100% on-premises, no external dependencies">✓</td>
+                        <td class="pricing free">$0</td>
+                    </tr>
+                    <tr>
+                        <td class="platform-name">PagerDuty</td>
+                        <td class="check">✓</td>
+                        <td class="check">✓</td>
+                        <td class="check">✓</td>
+                        <td class="partial">△</td>
+                        <td class="partial" title="Incident ID only">△</td>
+                        <td class="cross">✗</td>
+                        <td class="cross">✗</td>
+                        <td class="pricing">$21-41/user</td>
+                    </tr>
+                    <tr>
+                        <td class="platform-name">Opsgenie</td>
+                        <td class="check">✓</td>
+                        <td class="partial">△</td>
+                        <td class="check">✓</td>
+                        <td class="cross">✗</td>
+                        <td class="partial" title="Alert ID only">△</td>
+                        <td class="cross">✗</td>
+                        <td class="cross">✗</td>
+                        <td class="pricing">$11-23/user</td>
+                    </tr>
+                    <tr>
+                        <td class="platform-name">Grafana OnCall</td>
+                        <td class="partial">△</td>
+                        <td class="cross">✗</td>
+                        <td class="partial">△</td>
+                        <td class="cross">✗</td>
+                        <td class="partial" title="Via Tempo integration">△</td>
+                        <td class="partial">△</td>
+                        <td class="check">✓</td>
+                        <td class="pricing free">Free/$29+</td>
+                    </tr>
+                    <tr>
+                        <td class="platform-name">Splunk On-Call</td>
+                        <td class="check">✓</td>
+                        <td class="partial">△</td>
+                        <td class="check">✓</td>
+                        <td class="partial">△</td>
+                        <td class="partial" title="Incident ID only">△</td>
+                        <td class="cross">✗</td>
+                        <td class="cross">✗</td>
+                        <td class="pricing">$9-29/user</td>
+                    </tr>
+                    <tr>
+                        <td class="platform-name">incident.io</td>
+                        <td class="check">✓</td>
+                        <td class="partial">△</td>
+                        <td class="check">✓</td>
+                        <td class="cross">✗</td>
+                        <td class="partial" title="Incident ID only">△</td>
+                        <td class="cross">✗</td>
+                        <td class="cross">✗</td>
+                        <td class="pricing">$12-25/user</td>
+                    </tr>
+                    <tr>
+                        <td class="platform-name">Alertmanager</td>
+                        <td class="partial">△</td>
+                        <td class="cross">✗</td>
+                        <td class="cross">✗</td>
+                        <td class="cross">✗</td>
+                        <td class="cross" title="No built-in tracing">✗</td>
+                        <td class="partial">△</td>
+                        <td class="check">✓</td>
+                        <td class="pricing free">Free</td>
+                    </tr>
+                    <tr>
+                        <td class="platform-name">BigPanda</td>
+                        <td class="check">✓</td>
+                        <td class="check">✓</td>
+                        <td class="check">✓</td>
+                        <td class="check">✓</td>
+                        <td class="check" title="AIOps correlation">✓</td>
+                        <td class="cross">✗</td>
+                        <td class="cross">✗</td>
+                        <td class="pricing">$10-25/user</td>
+                    </tr>
+                    <tr>
+                        <td class="platform-name">ServiceNow</td>
+                        <td class="check">✓</td>
+                        <td class="check">✓</td>
+                        <td class="check">✓</td>
+                        <td class="check">✓</td>
+                        <td class="check" title="sys_id + CMDB correlation">✓</td>
+                        <td class="cross">✗</td>
+                        <td class="partial">△</td>
+                        <td class="pricing">Custom</td>
+                    </tr>
+                    <tr>
+                        <td class="platform-name">Datadog IM</td>
+                        <td class="check">✓</td>
+                        <td class="check">✓</td>
+                        <td class="check">✓</td>
+                        <td class="partial">△</td>
+                        <td class="check" title="Via Datadog APM">✓</td>
+                        <td class="partial">△</td>
+                        <td class="cross">✗</td>
+                        <td class="pricing">$15+/host</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="legend">
+                <div class="legend-item"><span class="check">✓</span> Full Support</div>
+                <div class="legend-item"><span class="partial">△</span> Partial/Limited</div>
+                <div class="legend-item"><span class="cross">✗</span> Not Available</div>
+            </div>
+            <div class="argus-features-detail">
+                <div class="feature-detail-title">Argus Capability Details</div>
+                <div class="feature-detail-grid five-items">
+                    <div class="feature-detail-item">
+                        <div class="fd-header">⚡ Priority-Based Processing</div>
+                        <div class="fd-desc">Prometheus rules set <code>priority</code> label (0=highest). Alerts processed in priority order.</div>
+                    </div>
+                    <div class="feature-detail-item">
+                        <div class="fd-header">📊 App Health SDK (ArgusApi)</div>
+                        <div class="fd-desc">Business apps emit heartbeats, exceptions, custom metrics via OTel. Alerts to NOC on anomalies.</div>
+                    </div>
+                    <div class="feature-detail-item">
+                        <div class="fd-header">💓 LivenessVector (Self-Health)</div>
+                        <div class="fd-desc">Monitors all internal callbacks (K8sPolling, NocSnapshot, Watchdog, LeaderElection). Detects internal failures.</div>
+                    </div>
+                    <div class="feature-detail-item">
+                        <div class="fd-header">🔌 Circuit Breaker</div>
+                        <div class="fd-desc"><code>NocHealthService</code> tracks consecutive failures. After 3 failures, stops file heartbeat. Auto-recovers on success.</div>
+                    </div>
+                    <div class="feature-detail-item">
+                        <div class="fd-header">🔍 E2E Alert Tracing</div>
+                        <div class="fd-desc">Dual-ID system: <code>correlationId</code> (tick-level) + <code>executionId</code> (alert lifecycle). Full traceability.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
+

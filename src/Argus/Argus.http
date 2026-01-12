@@ -1,0 +1,290 @@
+@Argus_HostAddress = http://localhost:5096
+
+# ============================================================
+# Argus API Examples
+# ============================================================
+
+# ============================================================
+# Health & Status Endpoints
+# ============================================================
+
+### Get Argus Health (unified state)
+GET {{Argus_HostAddress}}/api/health
+Accept: application/json
+
+###
+
+### Get K8s Layer Health
+GET {{Argus_HostAddress}}/api/k8s/health
+Accept: application/json
+X-Correlation-ID: test-k8s-health-001
+
+###
+
+### Get Watchdog Status
+GET {{Argus_HostAddress}}/api/watchdog
+Accept: application/json
+
+###
+
+### Get Alerts Vector Snapshot
+GET {{Argus_HostAddress}}/api/alerts
+Accept: application/json
+
+###
+
+### Get Circuit Breaker Status
+GET {{Argus_HostAddress}}/api/k8s/circuit-breaker
+Accept: application/json
+
+###
+
+# ============================================================
+# Alert Submission (Alertmanager API v2 Compatible)
+# ============================================================
+
+### Send a single firing alert with sendToNoc and suppressWindow properties (RECOMMENDED)
+POST {{Argus_HostAddress}}/api/v2/alerts
+Content-Type: application/json
+X-Correlation-ID: test-alert-001
+
+[
+  {
+    "status": "firing",
+    "sendToNoc": true,
+    "suppressWindow": "15m",
+    "labels": {
+      "alertname": "DatabaseConnectionFailed",
+      "platform": "argus",
+      "priority": "2",
+      "severity": "high",
+      "service": "api-gateway",
+      "environment": "production"
+    },
+    "annotations": {
+      "summary": "Database connection pool exhausted",
+      "description": "API Gateway cannot connect to the database. Connection pool is exhausted.",
+      "payload": "component=database,type=connectivity,severity=high"
+    },
+    "startsAt": "2024-01-15T10:30:00Z",
+    "generatorURL": "http://monitoring.example.com/alerts"
+  }
+]
+
+###
+
+### Send alert without platform label (will not be processed)
+POST {{Argus_HostAddress}}/api/v2/alerts
+Content-Type: application/json
+X-Correlation-ID: test-alert-002
+
+[
+  {
+    "status": "firing",
+    "sendToNoc": false,
+    "suppressWindow": "30m",
+    "labels": {
+      "alertname": "HighMemoryUsage",
+      "priority": "3",
+      "severity": "medium"
+    },
+    "annotations": {
+      "summary": "Memory usage above 90%",
+      "description": "Server memory usage is critically high",
+      "payload": "component=server,type=resource,severity=medium"
+    },
+    "startsAt": "2024-01-15T10:35:00Z"
+  }
+]
+
+###
+
+### Send alert with hourly suppress_window
+POST {{Argus_HostAddress}}/api/v2/alerts
+Content-Type: application/json
+X-Correlation-ID: test-alert-003
+
+[
+  {
+    "status": "firing",
+    "sendToNoc": true,
+    "labels": {
+      "alertname": "DiskSpaceLow",
+      "platform": "argus",
+      "priority": "4",
+      "severity": "low"
+    },
+    "annotations": {
+      "summary": "Disk space below 20%",
+      "description": "Available disk space is running low",
+      "payload": "component=storage,type=capacity,severity=low",
+      "suppress_window": "2h"
+    },
+    "startsAt": "2024-01-15T10:40:00Z"
+  }
+]
+
+###
+
+### Send alert with daily suppress_window
+POST {{Argus_HostAddress}}/api/v2/alerts
+Content-Type: application/json
+X-Correlation-ID: test-alert-004
+
+[
+  {
+    "status": "firing",
+    "sendToNoc": true,
+    "labels": {
+      "alertname": "BackupJobFailed",
+      "platform": "argus",
+      "priority": "3"
+    },
+    "annotations": {
+      "summary": "Daily backup job failed",
+      "description": "The scheduled backup job did not complete successfully",
+      "payload": "component=backup,type=job,severity=medium",
+      "suppress_window": "1d"
+    },
+    "startsAt": "2024-01-15T10:45:00Z"
+  }
+]
+
+###
+
+### Send multiple alerts at once
+POST {{Argus_HostAddress}}/api/v2/alerts
+Content-Type: application/json
+X-Correlation-ID: test-alert-batch-001
+
+[
+  {
+    "status": "firing",
+    "sendToNoc": true,
+    "labels": {
+      "alertname": "ServiceDown",
+      "platform": "argus",
+      "priority": "1",
+      "service": "payment-service"
+    },
+    "annotations": {
+      "summary": "Payment service is down",
+      "description": "Payment service is not responding to health checks",
+      "payload": "component=payment,type=availability,severity=critical",
+      "suppress_window": "5m"
+    },
+    "startsAt": "2024-01-15T11:00:00Z"
+  },
+  {
+    "status": "firing",
+    "sendToNoc": true,
+    "labels": {
+      "alertname": "HighErrorRate",
+      "platform": "argus",
+      "priority": "2",
+      "service": "payment-service"
+    },
+    "annotations": {
+      "summary": "High error rate detected",
+      "description": "Payment service error rate is above 5%",
+      "payload": "component=payment,type=errors,severity=high",
+      "suppress_window": "10m"
+    },
+    "startsAt": "2024-01-15T11:01:00Z"
+  }
+]
+
+###
+
+### Send a resolved alert
+POST {{Argus_HostAddress}}/api/v2/alerts
+Content-Type: application/json
+X-Correlation-ID: test-alert-resolved-001
+
+[
+  {
+    "status": "resolved",
+    "sendToNoc": true,
+    "labels": {
+      "alertname": "DatabaseConnectionFailed",
+      "platform": "argus",
+      "priority": "2",
+      "service": "api-gateway"
+    },
+    "annotations": {
+      "summary": "Database connection restored",
+      "description": "API Gateway can now connect to the database",
+      "payload": "component=database,type=connectivity,severity=high"
+    },
+    "startsAt": "2024-01-15T10:30:00Z",
+    "endsAt": "2024-01-15T10:45:00Z"
+  }
+]
+
+###
+
+### Send alert without suppress_window (no suppression)
+POST {{Argus_HostAddress}}/api/v2/alerts
+Content-Type: application/json
+X-Correlation-ID: test-alert-default-001
+
+[
+  {
+    "status": "firing",
+    "sendToNoc": true,
+    "labels": {
+      "alertname": "GenericAlert",
+      "platform": "argus",
+      "priority": "5"
+    },
+    "annotations": {
+      "summary": "Generic alert without custom suppress window",
+      "description": "This alert will not be suppressed",
+      "payload": "component=generic,type=test,severity=info"
+    },
+    "startsAt": "2024-01-15T11:30:00Z"
+  }
+]
+
+###
+
+# ============================================================
+# Kubernetes Probes
+# ============================================================
+
+### Liveness Probe
+GET {{Argus_HostAddress}}/livez
+Accept: application/json
+
+###
+
+### Readiness Probe
+GET {{Argus_HostAddress}}/readyz
+Accept: application/json
+
+###
+
+# ============================================================
+# Notes on suppress_window
+# ============================================================
+#
+# The suppress_window annotation controls how long an alert is suppressed
+# after being sent to NOC to prevent duplicate notifications.
+#
+# Supported formats (unit suffix is REQUIRED):
+#   - "120s" = 120 seconds
+#   - "5m" = 5 minutes
+#   - "2h" = 2 hours
+#   - "1d" = 1 day
+#
+# Note: Plain numbers without units (e.g., "120") are NOT supported.
+#       You must include the unit suffix (s, m, h, or d).
+#
+# If suppress_window is not specified, no suppression is applied.
+#
+# Examples:
+#   - Critical alerts: "5m" (short window, more frequent notifications)
+#   - Warning alerts: "15m" (medium window)
+#   - Info alerts: "1h" or "1d" (long window, less frequent)
+#
+###

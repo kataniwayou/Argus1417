@@ -1,0 +1,138 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kibana
+  namespace: argus
+  labels:
+    app: kibana
+    component: visualization
+    app.kubernetes.io/name: kibana
+    app.kubernetes.io/part-of: argus
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  selector:
+    matchLabels:
+      app: kibana
+  template:
+    metadata:
+      labels:
+        app: kibana
+        component: visualization
+        app.kubernetes.io/name: kibana
+        app.kubernetes.io/part-of: argus
+    spec:
+      # Wait for Elasticsearch to be ready before starting Kibana
+      initContainers:
+      - name: wait-for-elasticsearch
+        image: curlimages/curl:latest
+        command:
+        - sh
+        - -c
+        - |
+          echo "Waiting for Elasticsearch to be ready..."
+          until curl -f http://elasticsearch.argus:9200/_cluster/health?wait_for_status=yellow&timeout=60s; do
+            echo "Elasticsearch not ready yet, waiting 10 seconds..."
+            sleep 10
+          done
+          echo "Elasticsearch is ready!"
+        resources:
+          requests:
+            memory: "32Mi"
+            cpu: "10m"
+          limits:
+            memory: "64Mi"
+            cpu: "50m"
+
+      containers:
+      - name: kibana
+        image: docker.elastic.co/kibana/kibana:8.11.0
+        ports:
+        - containerPort: 5601
+          name: http
+        env:
+        - name: ELASTICSEARCH_HOSTS
+          value: "http://elasticsearch.argus:9200"
+        - name: SERVER_NAME
+          value: "kibana"
+        - name: SERVER_HOST
+          value: "0.0.0.0"
+        - name: XPACK_SECURITY_ENABLED
+          value: "false"
+        - name: XPACK_ENCRYPTEDSAVEDOBJECTS_ENCRYPTIONKEY
+          value: "a7a6311933d3503b89bc2dbc36572c33a6c10925682e591bffcab6911c06786d"
+        - name: ELASTICSEARCH_REQUESTTIMEOUT
+          value: "90000"
+        - name: ELASTICSEARCH_PINGTIMEOUT
+          value: "3000"
+        - name: KIBANA_DEFAULTAPPID
+          value: "discover"
+        - name: LOGGING_QUIET
+          value: "true"
+        - name: NODE_OPTIONS
+          value: "--max-old-space-size=2048"
+        # Startup probe - allows long initialization time
+        startupProbe:
+          httpGet:
+            path: /api/status
+            port: 5601
+            scheme: HTTP
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 10
+          failureThreshold: 30
+          successThreshold: 1
+        # Liveness probe - less aggressive after startup
+        livenessProbe:
+          httpGet:
+            path: /api/status
+            port: 5601
+            scheme: HTTP
+          initialDelaySeconds: 300
+          periodSeconds: 60
+          timeoutSeconds: 30
+          failureThreshold: 5
+          successThreshold: 1
+        # Readiness probe - determines when pod can receive traffic
+        readinessProbe:
+          httpGet:
+            path: /api/status
+            port: 5601
+            scheme: HTTP
+          initialDelaySeconds: 180
+          periodSeconds: 30
+          timeoutSeconds: 20
+          failureThreshold: 5
+          successThreshold: 1
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "75m"
+          limits:
+            memory: "3Gi"
+            cpu: "1000m"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: kibana
+  namespace: argus
+  labels:
+    app: kibana
+    component: visualization
+    app.kubernetes.io/name: kibana
+    app.kubernetes.io/part-of: argus
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5601
+    targetPort: 5601
+    name: http
+  selector:
+    app: kibana
+

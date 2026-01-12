@@ -1,0 +1,44 @@
+# ArgusClientApp Deployment
+# A sample client application using the Argus client wrapper
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: argusclientapp
+  namespace: argus
+  labels:
+    app: argusclientapp
+    app.kubernetes.io/name: argusclientapp
+    app.kubernetes.io/part-of: argus
+    argus.io/platform: argus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: argusclientapp
+  template:
+    metadata:
+      labels:
+        app: argusclientapp
+        app.kubernetes.io/name: argusclientapp
+        app.kubernetes.io/part-of: argus
+        argus.io/composite-key: argusclientapp_v2
+        argus.io/platform: argus
+    spec:
+      containers:
+      - name: argusclientapp
+        image: argusclientapp:latest
+        imagePullPolicy: Never
+        env:
+        - name: DOTNET_ENVIRONMENT
+          value: "Production"
+        # Override collector endpoint to use in-cluster OTel Collector
+        - name: ArgusApi__CollectorEndpoint
+          value: "http://otel-collector:4317"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "200m"
+

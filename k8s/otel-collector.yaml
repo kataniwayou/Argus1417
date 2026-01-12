@@ -1,0 +1,193 @@
+# OpenTelemetry Collector for Layer 3 alert testing
+# Minimal config - receives telemetry and exposes internal metrics for Prometheus to scrape
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: otel-collector-config
+  namespace: argus
+  labels:
+    app: otel-collector
+data:
+  otel-collector-config.yaml: |
+    receivers:
+      otlp:
+        protocols:
+          grpc:
+            endpoint: 0.0.0.0:4317
+          http:
+            endpoint: 0.0.0.0:4318
+
+    processors:
+      batch:
+        timeout: 10s
+        send_batch_size: 1024
+
+      # Transform processor - adds labels to all metrics at datapoint level
+      # This makes the labels available in Prometheus queries
+      # Hierarchy (highest priority wins): Datapoint > Scope (Meter) > Resource
+      # Use IsString() to verify attribute exists before copying
+      transform:
+        metric_statements:
+          - context: datapoint
+            statements:
+              # --- PLATFORM attribute ---
+              # 1. Copy from Scope (Meter) to Datapoint if scope has it and datapoint doesn't
+              - set(attributes["platform"], instrumentation_scope.attributes["platform"]) where IsString(instrumentation_scope.attributes["platform"]) and attributes["platform"] == nil
+              # 2. Fallback: Copy from Resource to Datapoint if still not set
+              - set(attributes["platform"], resource.attributes["platform"]) where IsString(resource.attributes["platform"]) and attributes["platform"] == nil
+
+              # --- Alert annotation attributes (only for platform=argus metrics) ---
+              # These follow the same Scope -> Resource fallback pattern
+
+              # send_to_noc
+              - set(attributes["send_to_noc"], instrumentation_scope.attributes["send_to_noc"]) where attributes["platform"] == "argus" and IsString(instrumentation_scope.attributes["send_to_noc"]) and attributes["send_to_noc"] == nil
+              - set(attributes["send_to_noc"], resource.attributes["send_to_noc"]) where attributes["platform"] == "argus" and IsString(resource.attributes["send_to_noc"]) and attributes["send_to_noc"] == nil
+
+              # payload
+              - set(attributes["payload"], instrumentation_scope.attributes["payload"]) where attributes["platform"] == "argus" and IsString(instrumentation_scope.attributes["payload"]) and attributes["payload"] == nil
+              - set(attributes["payload"], resource.attributes["payload"]) where attributes["platform"] == "argus" and IsString(resource.attributes["payload"]) and attributes["payload"] == nil
+
+              # suppress_window
+              - set(attributes["suppress_window"], instrumentation_scope.attributes["suppress_window"]) where attributes["platform"] == "argus" and IsString(instrumentation_scope.attributes["suppress_window"]) and attributes["suppress_window"] == nil
+              - set(attributes["suppress_window"], resource.attributes["suppress_window"]) where attributes["platform"] == "argus" and IsString(resource.attributes["suppress_window"]) and attributes["suppress_window"] == nil
+
+    exporters:
+      # Export received metrics to Prometheus via remote write
+      prometheusremotewrite:
+        endpoint: http://prometheus:9090/api/v1/write
+        tls:
+          insecure: true
+      # Export traces to Jaeger via OTLP
+      otlp/jaeger:
+        endpoint: jaeger:4317
+        tls:
+          insecure: true
+      # Debug exporter for traces/logs visibility
+      debug:
+        verbosity: detailed
+      # Export logs to Elasticsearch (Kibana visualization)
+      elasticsearch:
+        endpoints: ["http://elasticsearch.argus:9200"]
+        logs_index: "argus-logs"
+        timeout: 30s
+        sending_queue:
+          enabled: true
+          num_consumers: 10
+          queue_size: 5000
+        mapping:
+          mode: "ecs"
+
+    extensions:
+      health_check:
+        endpoint: 0.0.0.0:13133
+
+    service:
+      extensions: [health_check]
+      telemetry:
+        metrics:
+          level: detailed
+          readers:
+            - pull:
+                exporter:
+                  prometheus:
+                    host: "0.0.0.0"
+                    port: 8888
+      pipelines:
+        traces:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [otlp/jaeger, debug]
+        metrics:
+          receivers: [otlp]
+          processors: [transform, batch]
+          exporters: [prometheusremotewrite, debug]
+        logs:
+          receivers: [otlp]
+          processors: [batch]
+          exporters: [elasticsearch, debug]
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otel-collector
+  namespace: argus
+  labels:
+    app: otel-collector
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: otel-collector
+  template:
+    metadata:
+      labels:
+        app: otel-collector
+    spec:
+      containers:
+      - name: otel-collector
+        image: otel/opentelemetry-collector-contrib:0.132.0
+        ports:
+        - containerPort: 4317
+          name: grpc
+        - containerPort: 4318
+          name: http
+        - containerPort: 8888
+          name: metrics
+        - containerPort: 13133
+          name: health
+        args: ["--config=/etc/otel-collector-config.yaml"]
+        volumeMounts:
+        - name: otel-config
+          mountPath: /etc/otel-collector-config.yaml
+          subPath: otel-collector-config.yaml
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 13133
+          initialDelaySeconds: 30
+          periodSeconds: 30
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 13133
+          initialDelaySeconds: 10
+          periodSeconds: 10
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
+      volumes:
+      - name: otel-config
+        configMap:
+          name: otel-collector-config
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: otel-collector
+  namespace: argus
+  labels:
+    app: otel-collector
+spec:
+  type: ClusterIP
+  ports:
+  - name: grpc
+    port: 4317
+    targetPort: 4317
+  - name: http
+    port: 4318
+    targetPort: 4318
+  - name: metrics
+    port: 8888
+    targetPort: 8888
+  - name: health
+    port: 13133
+    targetPort: 13133
+  selector:
+    app: otel-collector
+

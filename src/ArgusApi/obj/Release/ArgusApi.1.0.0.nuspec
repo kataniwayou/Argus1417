@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>ArgusApi</id>
+    <version>1.0.0</version>
+    <authors>Argus Team</authors>
+    <readme>README.md</readme>
+    <description>Argus API client library for OpenTelemetry integration with heartbeat, exception recording, and tracing for background workers and services.</description>
+    <tags>argus opentelemetry monitoring heartbeat metrics</tags>
+    <repository type="git" />
+    <dependencies>
+      <group targetFramework="net9.0">
+        <dependency id="Microsoft.Extensions.Hosting.Abstractions" version="9.0.0" exclude="Build,Analyzers" />
+        <dependency id="Microsoft.Extensions.Logging.Console" version="10.0.1" exclude="Build,Analyzers" />
+        <dependency id="OpenTelemetry" version="1.11.2" exclude="Build,Analyzers" />
+        <dependency id="OpenTelemetry.Exporter.OpenTelemetryProtocol" version="1.11.2" exclude="Build,Analyzers" />
+        <dependency id="OpenTelemetry.Extensions.Hosting" version="1.11.2" exclude="Build,Analyzers" />
+        <dependency id="OpenTelemetry.Instrumentation.Runtime" version="1.14.0" exclude="Build,Analyzers" />
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="C:\Users\UserL\source\repos\Argus1413\src\ArgusApi\bin\Release\net9.0\ArgusApi.dll" target="lib\net9.0\ArgusApi.dll" />
+    <file src="C:\Users\UserL\source\repos\Argus1413\src\ArgusApi\README.md" target="\README.md" />
+  </files>
+</package>

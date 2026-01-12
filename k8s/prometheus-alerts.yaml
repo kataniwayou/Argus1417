@@ -1,0 +1,770 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-alerts
+  namespace: argus
+  labels:
+    app: prometheus
+    app.kubernetes.io/name: prometheus
+    app.kubernetes.io/part-of: argus
+data:
+  alerts.yml: |
+    # ============================================================
+    # Argus Alert Rules
+    #
+    # All alerts use:
+    #   platform: "argus"  - Required for Argus to process the alert
+    #   priority: "N"      - Priority level (lower = higher priority)
+    #
+    # Priority Ranges:
+    #   0-99:   argus-service (Prometheus/KSM infrastructure)
+    #   100-199: argus-infrastructure (Application infrastructure - pods, containers)
+    #   200+:    argus-api (Application functionality - health checks, workers)
+    #
+    # Priority Levels (argus-service 0-99):
+    #   0-9:   Critical - KSM scrape fail, WAL corruptions
+    #   10-49: Warning - Scrape failures, rule evaluation, storage, alert delivery
+    #
+    # Priority Levels (argus-infrastructure 100-199):
+    #   100-199: Infrastructure DOWN - Pod not running, container not ready, crash loops
+    #
+    # Priority Levels (argus-api 200+):
+    #   200-299: NOT FUNCTIONING - Health check failing, export failures
+    #   300+:    Worker Heartbeat Missing - Background worker not sending heartbeats
+    #
+    # Functional Areas:
+    #   1. Scraping Health - Can Prometheus scrape targets?
+    #   2. Rule Evaluation - Are alert rules being evaluated?
+    #   3. Storage Health - Are TSDB operations succeeding?
+    #   4. Alert Delivery - Is Prometheus sending alerts to Argus?
+    #   5. Application Health - Are monitored applications running and functional?
+    #   6. Worker Heartbeats - Are background workers sending heartbeats?
+    # ============================================================
+
+    groups:
+      # ============================================================
+      # Watchdog - Prometheus Heartbeat
+      # ============================================================
+      - name: argus-watchdog
+        rules:
+          # Watchdog alert - always firing when Prometheus is healthy
+          # This is the heartbeat that ArgusCoordinator monitors
+          # Note: Watchdog does NOT have a priority - it only updates heartbeat
+          - alert: Watchdog
+            expr: vector(1)
+            labels:
+              platform: "argus"
+            annotations:
+              summary: "Prometheus Watchdog"
+              description: "This alert is always firing. If it stops, Prometheus is unhealthy."
+              send_to_noc: "true"
+              payload: "component=prometheus,type=heartbeat"
+              suppress_window: "2m"
+
+      # ============================================================
+      # argus-service: Scraping Health (Priority 0-99)
+      # ============================================================
+      - name: argus-service-scraping
+        rules:
+          # KSM scrape target down (Priority 0 - Critical KSM data source)
+          - alert: KSMScrapeFailing
+            expr: up{job="kube-state-metrics"} == 0
+            for: 2m
+            labels:
+              platform: "argus"
+              priority: "0"
+            annotations:
+              summary: "Kube-state-metrics scrape failing"
+              description: "Prometheus cannot scrape kube-state-metrics for more than 2 minutes."
+              send_to_noc: "false"
+              payload: "component=kube-state-metrics,type=scraping,severity=critical"
+              suppress_window: "5m"
+
+          # Generic scrape target down (Priority 10 - Prometheus internal)
+          - alert: PrometheusScrapeTargetDown
+            expr: up == 0
+            for: 5m
+            labels:
+              platform: "argus"
+              priority: "10"
+            annotations:
+              summary: "Prometheus scrape target down"
+              description: "A Prometheus scrape target has been down for more than 5 minutes. Job: {{ $labels.job }}, Instance: {{ $labels.instance }}"
+              send_to_noc: "false"
+              payload: "component=prometheus,type=scraping,severity=warning"
+              suppress_window: "10m"
+
+      # ============================================================
+      # argus-service: Rule Evaluation Health (Priority 0-99)
+      # ============================================================
+      - name: argus-service-rule-evaluation
+        rules:
+          # Rule evaluation failures
+          - alert: PrometheusRuleEvaluationFailing
+            expr: increase(prometheus_rule_evaluation_failures_total[5m]) > 0
+            for: 5m
+            labels:
+              platform: "argus"
+              priority: "20"
+            annotations:
+              summary: "Prometheus rule evaluation failures"
+              description: "Prometheus is experiencing rule evaluation failures. Group: {{ $labels.rule_group }}"
+              send_to_noc: "false"
+              payload: "component=prometheus,type=rule-evaluation,severity=warning"
+              suppress_window: "15m"
+
+          # Rule evaluation slow
+          - alert: PrometheusRuleEvaluationSlow
+            expr: prometheus_rule_group_last_duration_seconds > prometheus_rule_group_interval_seconds
+            for: 5m
+            labels:
+              platform: "argus"
+              priority: "21"
+            annotations:
+              summary: "Prometheus rule evaluation slow"
+              description: "Prometheus rule group {{ $labels.rule_group }} is taking longer than its interval to evaluate."
+              send_to_noc: "false"
+              payload: "component=prometheus,type=rule-evaluation,severity=warning"
+              suppress_window: "15m"
+
+      # ============================================================
+      # argus-service: Storage Health (Priority 0-99)
+      # ============================================================
+      - name: argus-service-storage
+        rules:
+          # TSDB WAL corruptions (Priority 1 - Critical data integrity issue)
+          - alert: PrometheusTSDBWALCorruptions
+            expr: increase(prometheus_tsdb_wal_corruptions_total[1h]) > 0
+            labels:
+              platform: "argus"
+              priority: "1"
+            annotations:
+              summary: "Prometheus TSDB WAL corruptions"
+              description: "Prometheus TSDB Write-Ahead Log has corruptions. Data integrity at risk."
+              send_to_noc: "false"
+              payload: "component=prometheus,type=storage,severity=critical"
+              suppress_window: "5m"
+
+          # TSDB compaction failures
+          - alert: PrometheusTSDBCompactionsFailing
+            expr: increase(prometheus_tsdb_compactions_failed_total[1h]) > 0
+            labels:
+              platform: "argus"
+              priority: "30"
+            annotations:
+              summary: "Prometheus TSDB compaction failures"
+              description: "Prometheus TSDB is experiencing compaction failures."
+              send_to_noc: "false"
+              payload: "component=prometheus,type=storage,severity=warning"
+              suppress_window: "1h"
+
+          # Storage space low (only fires if retention_limit_bytes is configured and > 0)
+          - alert: PrometheusStorageSpaceLow
+            expr: |
+              (
+                prometheus_tsdb_retention_limit_bytes > 0
+                and
+                (prometheus_tsdb_storage_blocks_bytes / prometheus_tsdb_retention_limit_bytes) > 0.9
+              )
+              or
+              (1 - (node_filesystem_avail_bytes{mountpoint=~"/prometheus.*"} / node_filesystem_size_bytes{mountpoint=~"/prometheus.*"})) > 0.9
+            for: 5m
+            labels:
+              platform: "argus"
+              priority: "31"
+            annotations:
+              summary: "Prometheus storage space low"
+              description: "Prometheus storage is over 90% full. Data may be dropped."
+              send_to_noc: "false"
+              payload: "component=prometheus,type=storage,severity=warning"
+              suppress_window: "30m"
+
+      # ============================================================
+      # argus-service: Alert Delivery Health (Priority 0-99)
+      # ============================================================
+      - name: argus-service-alert-delivery
+        rules:
+          # Prometheus not connected to Argus
+          - alert: PrometheusNotConnectedToArgus
+            expr: prometheus_notifications_alertmanagers_discovered < 1
+            for: 5m
+            labels:
+              platform: "argus"
+              priority: "40"
+            annotations:
+              summary: "Prometheus not connected to Argus"
+              description: "Prometheus has no Argus targets discovered. Alerts will not be sent."
+              send_to_noc: "false"
+              payload: "component=prometheus,type=alert-delivery,severity=warning"
+              suppress_window: "10m"
+
+          # Alert notification failures
+          - alert: PrometheusAlertDeliveryFailing
+            expr: rate(prometheus_notifications_errors_total[5m]) > 0
+            for: 5m
+            labels:
+              platform: "argus"
+              priority: "41"
+            annotations:
+              summary: "Prometheus alert delivery failing"
+              description: "Prometheus is failing to send alerts to Argus."
+              send_to_noc: "false"
+              payload: "component=prometheus,type=alert-delivery,severity=warning"
+              suppress_window: "10m"
+
+          # Notification queue full
+          - alert: PrometheusNotificationQueueFull
+            expr: prometheus_notifications_queue_length > prometheus_notifications_queue_capacity * 0.9
+            for: 5m
+            labels:
+              platform: "argus"
+              priority: "42"
+            annotations:
+              summary: "Prometheus notification queue near capacity"
+              description: "Prometheus alert notification queue is over 90% full. Alerts may be dropped."
+              send_to_noc: "false"
+              payload: "component=prometheus,type=alert-delivery,severity=warning"
+              suppress_window: "10m"
+
+      # ============================================================
+      # argus-infrastructure: OpenTelemetry Collector (Priority 100-199)
+      # Uses KSM metrics to detect pod/container issues
+      # ============================================================
+      - name: argus-infrastructure-otel-collector
+        rules:
+          # Collector pod not running
+          - alert: OtelCollectorDown
+            expr: |
+              kube_deployment_status_replicas_available{deployment="otel-collector", namespace="argus"} == 0
+            for: 1m
+            labels:
+              platform: "argus"
+              priority: "100"
+            annotations:
+              summary: "OpenTelemetry Collector is DOWN"
+              description: "OTel Collector deployment has no available replicas. Telemetry pipeline is broken."
+              send_to_noc: "false"
+              payload: "component=otel-collector,type=infrastructure,severity=high"
+              suppress_window: "5m"
+
+          # Collector container not ready
+          - alert: OtelCollectorNotReady
+            expr: |
+              kube_pod_container_status_ready{container="otel-collector", namespace="argus"} == 0
+            for: 2m
+            labels:
+              platform: "argus"
+              priority: "101"
+            annotations:
+              summary: "OpenTelemetry Collector container not ready"
+              description: "OTel Collector container is not ready. Pod: {{ $labels.pod }}"
+              send_to_noc: "false"
+              payload: "component=otel-collector,type=infrastructure,severity=high"
+              suppress_window: "5m"
+
+          # Collector restarting frequently
+          - alert: OtelCollectorCrashLooping
+            expr: |
+              increase(kube_pod_container_status_restarts_total{container="otel-collector", namespace="argus"}[15m]) > 2
+            for: 1m
+            labels:
+              platform: "argus"
+              priority: "102"
+            annotations:
+              summary: "OpenTelemetry Collector is crash-looping"
+              description: "OTel Collector has restarted more than 2 times in 15 minutes. Pod: {{ $labels.pod }}"
+              send_to_noc: "false"
+              payload: "component=otel-collector,type=infrastructure,severity=high"
+              suppress_window: "5m"
+
+      # ============================================================
+      # argus-infrastructure: Elasticsearch (Priority 100-199)
+      # Uses KSM metrics to detect pod/container issues
+      # ============================================================
+      - name: argus-infrastructure-elasticsearch
+        rules:
+          # Elasticsearch deployment not running
+          - alert: ElasticsearchDown
+            expr: |
+              kube_deployment_status_replicas_available{deployment="elasticsearch", namespace="argus"} == 0
+            for: 1m
+            labels:
+              platform: "argus"
+              priority: "103"
+            annotations:
+              summary: "Elasticsearch is DOWN"
+              description: "Elasticsearch deployment has no available replicas. Log storage is unavailable."
+              send_to_noc: "false"
+              payload: "component=elasticsearch,type=infrastructure,severity=high"
+              suppress_window: "5m"
+
+          # Elasticsearch container not ready
+          - alert: ElasticsearchNotReady
+            expr: |
+              kube_pod_container_status_ready{container="elasticsearch", namespace="argus"} == 0
+            for: 2m
+            labels:
+              platform: "argus"
+              priority: "104"
+            annotations:
+              summary: "Elasticsearch container not ready"
+              description: "Elasticsearch container is not ready. Pod: {{ $labels.pod }}"
+              send_to_noc: "false"
+              payload: "component=elasticsearch,type=infrastructure,severity=high"
+              suppress_window: "5m"
+
+          # Elasticsearch restarting frequently
+          - alert: ElasticsearchCrashLooping
+            expr: |
+              increase(kube_pod_container_status_restarts_total{container="elasticsearch", namespace="argus"}[15m]) > 2
+            for: 1m
+            labels:
+              platform: "argus"
+              priority: "105"
+            annotations:
+              summary: "Elasticsearch is crash-looping"
+              description: "Elasticsearch has restarted more than 2 times in 15 minutes. Pod: {{ $labels.pod }}"
+              send_to_noc: "false"
+              payload: "component=elasticsearch,type=infrastructure,severity=high"
+              suppress_window: "5m"
+
+      # ============================================================
+      # argus-infrastructure: Kibana (Priority 100-199)
+      # Uses KSM metrics to detect pod/container issues
+      # ============================================================
+      - name: argus-infrastructure-kibana
+        rules:
+          # Kibana deployment not running
+          - alert: KibanaDown
+            expr: |
+              kube_deployment_status_replicas_available{deployment="kibana", namespace="argus"} == 0
+            for: 1m
+            labels:
+              platform: "argus"
+              priority: "106"
+            annotations:
+              summary: "Kibana is DOWN"
+              description: "Kibana deployment has no available replicas. Log visualization is unavailable."
+              send_to_noc: "false"
+              payload: "component=kibana,type=infrastructure,severity=high"
+              suppress_window: "5m"
+
+          # Kibana container not ready
+          - alert: KibanaNotReady
+            expr: |
+              kube_pod_container_status_ready{container="kibana", namespace="argus"} == 0
+            for: 2m
+            labels:
+              platform: "argus"
+              priority: "107"
+            annotations:
+              summary: "Kibana container not ready"
+              description: "Kibana container is not ready. Pod: {{ $labels.pod }}"
+              send_to_noc: "false"
+              payload: "component=kibana,type=infrastructure,severity=high"
+              suppress_window: "5m"
+
+          # Kibana restarting frequently
+          - alert: KibanaCrashLooping
+            expr: |
+              increase(kube_pod_container_status_restarts_total{container="kibana", namespace="argus"}[15m]) > 2
+            for: 1m
+            labels:
+              platform: "argus"
+              priority: "108"
+            annotations:
+              summary: "Kibana is crash-looping"
+              description: "Kibana has restarted more than 2 times in 15 minutes. Pod: {{ $labels.pod }}"
+              send_to_noc: "false"
+              payload: "component=kibana,type=infrastructure,severity=high"
+              suppress_window: "5m"
+
+      # ============================================================
+      # argus-infrastructure: Grafana (Priority 100-199)
+      # Uses KSM metrics to detect pod/container issues
+      # ============================================================
+      - name: argus-infrastructure-grafana
+        rules:
+          # Grafana deployment not running
+          - alert: GrafanaDown
+            expr: |
+              kube_deployment_status_replicas_available{deployment="grafana", namespace="argus"} == 0
+            for: 1m
+            labels:
+              platform: "argus"
+              priority: "109"
+            annotations:
+              summary: "Grafana is DOWN"
+              description: "Grafana deployment has no available replicas. Metrics visualization is unavailable."
+              send_to_noc: "false"
+              payload: "component=grafana,type=infrastructure,severity=high"
+              suppress_window: "5m"
+
+          # Grafana container not ready
+          - alert: GrafanaNotReady
+            expr: |
+              kube_pod_container_status_ready{container="grafana", namespace="argus"} == 0
+            for: 2m
+            labels:
+              platform: "argus"
+              priority: "110"
+            annotations:
+              summary: "Grafana container not ready"
+              description: "Grafana container is not ready. Pod: {{ $labels.pod }}"
+              send_to_noc: "false"
+              payload: "component=grafana,type=infrastructure,severity=high"
+              suppress_window: "5m"
+
+          # Grafana restarting frequently
+          - alert: GrafanaCrashLooping
+            expr: |
+              increase(kube_pod_container_status_restarts_total{container="grafana", namespace="argus"}[15m]) > 2
+            for: 1m
+            labels:
+              platform: "argus"
+              priority: "111"
+            annotations:
+              summary: "Grafana is crash-looping"
+              description: "Grafana has restarted more than 2 times in 15 minutes. Pod: {{ $labels.pod }}"
+              send_to_noc: "false"
+              payload: "component=grafana,type=infrastructure,severity=high"
+              suppress_window: "5m"
+
+      # ============================================================
+      # Note: Elasticsearch and Kibana functional alerts removed.
+      # These services don't expose native Prometheus metrics.
+      # Monitoring is handled by KSM-based infrastructure alerts:
+      # - ElasticsearchDown, ElasticsearchNotReady, ElasticsearchCrashLooping
+      # - KibanaDown, KibanaNotReady, KibanaCrashLooping
+      # ============================================================
+
+      # ============================================================
+      # argus-infrastructure: Jaeger (Priority 100-199)
+      # Uses KSM metrics to detect pod/container issues
+      # ============================================================
+      - name: argus-infrastructure-jaeger
+        rules:
+          # Jaeger deployment not running
+          - alert: JaegerDown
+            expr: |
+              kube_deployment_status_replicas_available{deployment="jaeger", namespace="argus"} == 0
+            for: 1m
+            labels:
+              platform: "argus"
+              priority: "112"
+            annotations:
+              summary: "Jaeger is DOWN"
+              description: "Jaeger deployment has no available replicas. Distributed tracing is unavailable."
+              send_to_noc: "false"
+              payload: "component=jaeger,type=infrastructure,severity=high"
+              suppress_window: "5m"
+
+          # Jaeger container not ready
+          - alert: JaegerNotReady
+            expr: |
+              kube_pod_container_status_ready{container="jaeger", namespace="argus"} == 0
+            for: 2m
+            labels:
+              platform: "argus"
+              priority: "113"
+            annotations:
+              summary: "Jaeger container not ready"
+              description: "Jaeger container is not ready. Pod: {{ $labels.pod }}"
+              send_to_noc: "false"
+              payload: "component=jaeger,type=infrastructure,severity=high"
+              suppress_window: "5m"
+
+          # Jaeger restarting frequently
+          - alert: JaegerCrashLooping
+            expr: |
+              increase(kube_pod_container_status_restarts_total{container="jaeger", namespace="argus"}[15m]) > 2
+            for: 1m
+            labels:
+              platform: "argus"
+              priority: "114"
+            annotations:
+              summary: "Jaeger is crash-looping"
+              description: "Jaeger has restarted more than 2 times in 15 minutes. Pod: {{ $labels.pod }}"
+              send_to_noc: "false"
+              payload: "component=jaeger,type=infrastructure,severity=high"
+              suppress_window: "5m"
+
+      # ============================================================
+      # argus-api: OpenTelemetry Collector Functional (Priority 200+)
+      # Uses internal metrics to detect functional issues
+      # ============================================================
+      - name: argus-api-otel-collector
+        rules:
+          # Collector scrape target down (Prometheus can't reach it)
+          - alert: OtelCollectorUnreachable
+            expr: up{job="otel-collector"} == 0
+            for: 2m
+            labels:
+              platform: "argus"
+              priority: "200"
+            annotations:
+              summary: "OpenTelemetry Collector is unreachable"
+              description: "Prometheus cannot scrape OTel Collector metrics endpoint. Collector may not be functioning."
+              send_to_noc: "false"
+              payload: "component=otel-collector,type=functional,severity=medium"
+              suppress_window: "10m"
+
+          # Collector dropping data (export failures)
+          - alert: OtelCollectorExportFailing
+            expr: |
+              rate(otelcol_exporter_send_failed_spans[5m]) > 0
+              or
+              rate(otelcol_exporter_send_failed_metric_points[5m]) > 0
+              or
+              rate(otelcol_exporter_send_failed_log_records[5m]) > 0
+            for: 5m
+            labels:
+              platform: "argus"
+              priority: "201"
+            annotations:
+              summary: "OpenTelemetry Collector export failing"
+              description: "OTel Collector is failing to export telemetry data. Data may be lost."
+              send_to_noc: "false"
+              payload: "component=otel-collector,type=functional,severity=medium"
+              suppress_window: "15m"
+
+          # Collector queue full (backpressure)
+          - alert: OtelCollectorQueueFull
+            expr: |
+              otelcol_exporter_queue_size / otelcol_exporter_queue_capacity > 0.9
+            for: 5m
+            labels:
+              platform: "argus"
+              priority: "202"
+            annotations:
+              summary: "OpenTelemetry Collector queue near capacity"
+              description: "OTel Collector export queue is over 90% full. Backpressure may cause data loss."
+              send_to_noc: "false"
+              payload: "component=otel-collector,type=functional,severity=medium"
+              suppress_window: "15m"
+
+          # Collector receiving no data
+          - alert: OtelCollectorNoData
+            expr: |
+              rate(otelcol_receiver_accepted_spans[5m]) == 0
+              and
+              rate(otelcol_receiver_accepted_metric_points[5m]) == 0
+            for: 10m
+            labels:
+              platform: "argus"
+              priority: "203"
+            annotations:
+              summary: "OpenTelemetry Collector receiving no data"
+              description: "OTel Collector has received no spans or metrics for 10 minutes. Pipeline may be broken."
+              send_to_noc: "false"
+              payload: "component=otel-collector,type=functional,severity=medium"
+              suppress_window: "30m"
+
+      # ============================================================
+      # argus-api: Jaeger Functional (Priority 200+)
+      # Uses Jaeger internal metrics to detect functional issues
+      # ============================================================
+      - name: argus-api-jaeger
+        rules:
+          # Jaeger scrape target down (Prometheus can't reach it)
+          - alert: JaegerUnreachable
+            expr: up{job="jaeger"} == 0
+            for: 2m
+            labels:
+              platform: "argus"
+              priority: "204"
+            annotations:
+              summary: "Jaeger is unreachable"
+              description: "Prometheus cannot scrape Jaeger metrics endpoint. Jaeger may not be functioning."
+              send_to_noc: "false"
+              payload: "component=jaeger,type=functional,severity=medium"
+              suppress_window: "10m"
+
+          # Jaeger dropping spans
+          - alert: JaegerSpansDropped
+            expr: |
+              rate(jaeger_collector_spans_dropped_total[5m]) > 0
+            for: 5m
+            labels:
+              platform: "argus"
+              priority: "205"
+            annotations:
+              summary: "Jaeger is dropping spans"
+              description: "Jaeger collector is dropping spans. Traces may be lost."
+              send_to_noc: "false"
+              payload: "component=jaeger,type=functional,severity=medium"
+              suppress_window: "15m"
+
+          # Jaeger query errors
+          - alert: JaegerQueryFailing
+            expr: |
+              rate(jaeger_query_requests_total{result="err"}[5m]) > 0
+            for: 5m
+            labels:
+              platform: "argus"
+              priority: "206"
+            annotations:
+              summary: "Jaeger query API is failing"
+              description: "Jaeger query API is returning errors. Trace queries may be failing."
+              send_to_noc: "false"
+              payload: "component=jaeger,type=functional,severity=medium"
+              suppress_window: "15m"
+
+          # Jaeger service stopped sending spans
+          # Groups by service (svc label), excludes placeholder "other-services" bucket
+          # Only fires if service was previously sending spans (>0 in last hour) but now stopped
+          - alert: JaegerNoSpansReceived
+            expr: |
+              (
+                sum by (svc) (rate(jaeger_collector_spans_received_total{svc!="other-services"}[10m])) == 0
+              )
+              and
+              (
+                sum by (svc) (increase(jaeger_collector_spans_received_total{svc!="other-services"}[1h])) > 0
+              )
+            for: 10m
+            labels:
+              platform: "argus"
+              priority: "207"
+            annotations:
+              summary: "Service {{ $labels.svc }} stopped sending spans"
+              description: "Service {{ $labels.svc }} was sending spans but has stopped for 10+ minutes. Check if the service is down or tracing is misconfigured."
+              send_to_noc: "false"
+              payload: "component=jaeger,type=functional,severity=medium,service={{ $labels.svc }}"
+              suppress_window: "30m"
+
+      # ============================================================
+      # argus-api: Application Alerts (Priority 300-312)
+      # Monitors ArgusApi client metrics for platform=argus
+      # Priority levels by business impact:
+      # - 300: CRITICAL - Service completely down (heartbeat stopped)
+      # - 310: HIGH - High risk of immediate failure (memory/threadpool issues)
+      # - 311: MEDIUM - Performance degradation (GC pressure)
+      # - 312: LOW - Informational (CPU availability)
+      # ============================================================
+      - name: argus-api-application-alerts
+        rules:
+          # CRITICAL: Worker heartbeat stopped - detects when heartbeats are not being sent
+          # Metric labels (send_to_noc, suppress_window, payload) override alert defaults
+          # Only fires when pods with argus platform label are running but heartbeats stopped
+          # Works across all namespaces where argus platform apps are deployed
+          #
+          # Detection logic:
+          # - Uses last_over_time to get the last known metric value (survives staleness for 5m)
+          # - Uses increase over 2m window to detect if heartbeats stopped
+          # - When metric goes stale, increase returns empty but last_over_time preserves labels
+          - alert: ArgusWorkerHeartbeatStopped
+            expr: |
+              (
+                # Get last known heartbeat metric (survives staleness up to 5m lookback)
+                last_over_time(argus_heartbeat_count_total{platform="argus"}[5m])
+                # Check if the counter has NOT increased in the last 2 minutes
+                unless on(instance, job, worker)
+                (increase(argus_heartbeat_count_total{platform="argus"}[2m]) > 0)
+              )
+              and on()
+              (
+                # Only alert when argus platform pods are running
+                count(
+                  kube_pod_status_phase{phase="Running"}
+                  * on(pod, namespace) group_left()
+                  kube_pod_labels{label_argus_io_platform="argus"}
+                ) > 0
+              )
+            for: 1m
+            labels:
+              priority: "300"
+              # These are defaults - metric labels will override if present
+              send_to_noc: "true"
+              payload: "component=argus-api,type=application,severity=critical"
+              suppress_window: "5m"
+            annotations:
+              summary: "Argus worker heartbeat stopped"
+              description: "Worker {{ $labels.worker }} (job={{ $labels.job }}) heartbeat stopped for 1 minute."
+
+          # HIGH: High memory usage - could lead to OOM
+          - alert: ArgusClientHighMemoryUsage
+            expr: |
+              dotnet_process_memory_working_set_bytes{platform="argus"} > 500000000
+            for: 5m
+            labels:
+              platform: "argus"
+              priority: "310"
+            annotations:
+              summary: "Argus client using high memory"
+              description: "Client {{ $labels.job }} is using {{ $value | humanize }}B of memory (threshold: 500MB)."
+              send_to_noc: "false"
+              payload: "component=argus-api,type=application,severity=high"
+              suppress_window: "15m"
+
+          # HIGH: ThreadPool queue length high - could lead to timeouts
+          - alert: ArgusClientThreadPoolQueueHigh
+            expr: |
+              dotnet_thread_pool_queue_length_total{platform="argus"} > 100
+            for: 2m
+            labels:
+              platform: "argus"
+              priority: "310"
+            annotations:
+              summary: "Argus client ThreadPool queue is high"
+              description: "Client {{ $labels.job }} has {{ $value }} items queued in ThreadPool."
+              send_to_noc: "false"
+              payload: "component=argus-api,type=application,severity=high"
+              suppress_window: "10m"
+
+          # MEDIUM: High GC pressure - performance degradation
+          - alert: ArgusClientHighGCPressure
+            expr: |
+              rate(dotnet_gc_collections_total{platform="argus"}[5m]) > 10
+            for: 5m
+            labels:
+              platform: "argus"
+              priority: "311"
+            annotations:
+              summary: "Argus client experiencing high GC pressure"
+              description: "Client {{ $labels.job }} is experiencing high garbage collection rate ({{ $value }} collections/sec)."
+              send_to_noc: "false"
+              payload: "component=argus-api,type=application,severity=medium"
+              suppress_window: "15m"
+
+          # MEDIUM: High CPU usage - performance degradation
+          - alert: ArgusClientHighCPUUsage
+            expr: |
+              rate(dotnet_process_cpu_time_seconds_total{platform="argus"}[5m]) / dotnet_process_cpu_count{platform="argus"} > 0.8
+            for: 5m
+            labels:
+              platform: "argus"
+              priority: "312"
+            annotations:
+              summary: "Argus client experiencing high CPU usage"
+              description: "Client {{ $labels.job }} is using {{ $value | humanizePercentage }} CPU per core (threshold: 80%)."
+              send_to_noc: "false"
+              payload: "component=argus-api,type=application,severity=medium"
+              suppress_window: "15m"
+
+      # ============================================================
+      # argus-api: Infrastructure Alerts (Priority 300+)
+      # Monitors Kubernetes infrastructure metrics for ArgusApi clients
+      # Priority levels by business impact:
+      # - 300: CRITICAL - Application failing to start (crash looping)
+      # ============================================================
+      - name: argus-api-infrastructure-alerts
+        rules:
+          # CRITICAL: Pod restarting frequently - crash looping
+          # Detects when any pod with argus.io/platform=argus label restarts more than 3 times in 5 minutes
+          # Works across all namespaces where argus platform apps are deployed
+          - alert: ArgusClientPodCrashLooping
+            expr: |
+              increase(kube_pod_container_status_restarts_total[5m])
+              * on(pod, namespace) group_left(label_argus_io_composite_key, label_argus_io_platform)
+              kube_pod_labels{label_argus_io_platform="argus"} > 3
+            for: 1m
+            labels:
+              platform: "argus"
+              priority: "300"
+            annotations:
+              summary: "Argus client pod is crash-looping"
+              description: "Pod {{ $labels.pod }} (composite_key={{ $labels.label_argus_io_composite_key }}) has restarted {{ $value }} times in the last 5 minutes."
+              send_to_noc: "true"
+              payload: "component=argus-api,type=infrastructure,severity=critical"
+              suppress_window: "10m"

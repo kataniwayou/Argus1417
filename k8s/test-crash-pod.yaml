@@ -1,0 +1,19 @@
+# Test pod for ArgusClientPodCrashLooping alert
+# This pod will crash every 5 seconds, triggering the alert after 3+ restarts in 5 minutes
+# Usage: kubectl apply -f k8s/test-crash-pod.yaml
+# Cleanup: kubectl delete -f k8s/test-crash-pod.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: argus-crash-test
+  namespace: argus
+  labels:
+    argus.io/platform: argus
+    argus.io/composite-key: crash-test
+spec:
+  containers:
+  - name: crasher
+    image: busybox
+    command: ["sh", "-c", "echo 'Crashing in 5s...'; sleep 5; exit 1"]
+  restartPolicy: Always
+

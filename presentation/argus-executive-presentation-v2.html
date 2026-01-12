@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Argus - Executive Presentation v2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0a0f;
+            --bg-card: #12121a;
+            --bg-card-hover: #1a1a25;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-purple: #8b5cf6;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border-subtle: rgba(255,255,255,0.08);
+            --glow-blue: rgba(59, 130, 246, 0.3);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .slide {
+            width: 1280px;
+            height: 720px;
+            margin: 20px auto;
+            background: linear-gradient(145deg, #0d0d14 0%, #0a0a12 50%, #080810 100%);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            page-break-after: always;
+        }
+
+        /* Slide Header */
+        .slide-header {
+            padding: 30px 50px 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            background: linear-gradient(180deg, rgba(59, 130, 246, 0.05) 0%, transparent 100%);
+        }
+
+        .slide-header h2 {
+            font-size: 32px;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.5px;
+        }
+
+        .slide-header .subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .slide-body {
+            padding: 30px 50px;
+            height: calc(100% - 100px);
+            overflow: hidden;
+        }
+
+        /* Title Slide Styles */
+        .slide-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            background: radial-gradient(ellipse at center, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+        }
+
+        .slide-title .content {
+            display: flex;
+            align-items: center;
+            gap: 60px;
+        }
+
+        .slide-title .hero-image {
+            width: 320px;
+            height: 400px;
+            border-radius: 16px;
+            object-fit: cover;
+            box-shadow: 0 0 80px var(--glow-blue);
+            border: 2px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .slide-title .title-content {
+            max-width: 550px;
+        }
+
+        .slide-title h1 {
+            font-size: 80px;
+            font-weight: 800;
+            letter-spacing: -2px;
+            background: linear-gradient(135deg, #fff 0%, #3b82f6 50%, #06b6d4 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .slide-title .tagline {
+            font-size: 24px;
+            color: var(--accent-cyan);
+            font-weight: 500;
+            margin: 8px 0 24px;
+            letter-spacing: 2px;
+        }
+
+        .slide-title .description {
+            font-size: 16px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            border-left: 3px solid var(--accent-blue);
+            padding-left: 20px;
+        }
+
+        .slide-title .tech-badges {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .slide-title .badge {
+            padding: 8px 16px;
+            background: rgba(59, 130, 246, 0.15);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--accent-blue);
+        }
+
+        /* Grid Layout */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.2s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(59, 130, 246, 0.3);
+            background: var(--bg-card-hover);
+        }
+
+        .card-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-bottom: 12px;
+        }
+
+        .card-icon.blue { background: rgba(59, 130, 246, 0.2); }
+        .card-icon.green { background: rgba(16, 185, 129, 0.2); }
+        .card-icon.orange { background: rgba(245, 158, 11, 0.2); }
+        .card-icon.purple { background: rgba(139, 92, 246, 0.2); }
+        .card-icon.cyan { background: rgba(6, 182, 212, 0.2); }
+        .card-icon.red { background: rgba(239, 68, 68, 0.2); }
+
+        .card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .card p {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Feature List */
+        .feature-list {
+            list-style: none;
+        }
+
+        .feature-list li {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .feature-list li:last-child {
+            border-bottom: none;
+        }
+
+        .feature-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .feature-content h4 {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .feature-content p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Problem Slide */
+        .problem-card {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, transparent 100%);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+
+        .problem-card .card-icon {
+            background: rgba(239, 68, 68, 0.2);
+        }
+
+        .solution-card {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, transparent 100%);
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+
+        .solution-card .card-icon {
+            background: rgba(16, 185, 129, 0.2);
+        }
+
+        /* Code Block */
+        .code-block {
+            background: #0d0d12;
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            line-height: 1.6;
+            overflow-x: auto;
+        }
+
+        .code-block .comment { color: #6b7280; }
+        .code-block .keyword { color: #c084fc; }
+        .code-block .string { color: #34d399; }
+        .code-block .method { color: #60a5fa; }
+        .code-block .class { color: #fbbf24; }
+
+        /* Metric Box */
+        .metric-box {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .metric-value {
+            font-size: 36px;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+
+        .metric-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Architecture Diagram */
+        .arch-container {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .arch-svg {
+            width: 100%;
+            max-height: 550px;
+        }
+
+        .arch-svg text {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .arch-svg .box-label {
+            font-size: 11px;
+            fill: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .arch-svg .component-label {
+            font-size: 12px;
+            fill: var(--text-primary);
+            font-weight: 600;
+            text-anchor: middle;
+        }
+
+        .arch-svg .component-sublabel {
+            font-size: 9px;
+            fill: var(--text-muted);
+            text-anchor: middle;
+        }
+
+        /* Flow Diagram */
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            margin-bottom: 12px;
+        }
+
+        .flow-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .flow-content h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .flow-content p {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Comparison Table */
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        .comparison-table th {
+            background: var(--bg-card);
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--accent-blue);
+        }
+
+        .comparison-table td {
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+
+        .comparison-table tr:hover td {
+            background: var(--bg-card);
+        }
+
+        .check { color: var(--accent-green); }
+        .cross { color: var(--accent-red); }
+        .partial { color: var(--accent-orange); }
+
+        /* Decorative Elements */
+        .decorative-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+
+        .decorative-glow {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            border-radius: 50%;
+            filter: blur(100px);
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .glow-blue { background: var(--accent-blue); }
+        .glow-purple { background: var(--accent-purple); }
+        .glow-cyan { background: var(--accent-cyan); }
+    </style>
+</head>
+<body>
+
+    <!-- Slide 1: Title -->
+    <div class="slide">
+        <div class="decorative-grid"></div>
+        <div class="decorative-glow glow-blue" style="top: -200px; right: -100px;"></div>
+        <div class="decorative-glow glow-purple" style="bottom: -200px; left: -100px;"></div>
+        <div class="slide-title">
+            <div class="content">
+                <img src="argus-panoptes.jpg" alt="Argus Panoptes" class="hero-image">
+                <div class="title-content">
+                    <h1>ARGUS</h1>
+                    <div class="tagline">THE ALL-SEEING GUARDIAN</div>
+                    <div class="description">
+                        Enterprise-grade observability platform that unifies Kubernetes health monitoring,
+                        Prometheus alerts, and application heartbeats into a single, self-healing system
+                        with intelligent NOC integration.
+                    </div>
+                    <div class="tech-badges">
+                        <span class="badge">.NET 9</span>
+                        <span class="badge">OpenTelemetry</span>
+                        <span class="badge">Kubernetes Native</span>
+                        <span class="badge">High Availability</span>
+                        <span class="badge">Self-Healing</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 2: The Problem -->
+    <div class="slide">
+        <div class="decorative-grid"></div>
+        <div class="slide-header">
+            <h2>The Problem: Monitoring Blind Spots</h2>
+            <div class="subtitle">Why traditional monitoring fails in complex Kubernetes environments</div>
+        </div>
+        <div class="slide-body">
+            <div class="grid-2" style="height: 100%;">
+                <div>
+                    <h3 style="color: var(--accent-red); margin-bottom: 20px; font-size: 18px;">❌ Current Challenges</h3>
+                    <div class="card problem-card" style="margin-bottom: 16px;">
+                        <div class="card-icon">🔇</div>
+                        <h3>Silent Prometheus Failures</h3>
+                        <p>When Prometheus stops scraping, you get no alerts—just silence. By the time you notice, critical issues may have gone undetected for hours.</p>
+                    </div>
+                    <div class="card problem-card" style="margin-bottom: 16px;">
+                        <div class="card-icon">📢</div>
+                        <h3>Alert Fatigue</h3>
+                        <p>NOC teams receive hundreds of duplicate alerts during incidents. Critical signals get lost in the noise, leading to delayed response times.</p>
+                    </div>
+                    <div class="card problem-card" style="margin-bottom: 16px;">
+                        <div class="card-icon">🔌</div>
+                        <h3>Fragmented Monitoring</h3>
+                        <p>K8s health, Prometheus alerts, and application heartbeats exist in silos. No unified view means no correlated insights.</p>
+                    </div>
+                    <div class="card problem-card">
+                        <div class="card-icon">💀</div>
+                        <h3>Single Points of Failure</h3>
+                        <p>Most monitoring solutions lack true HA. When the monitor dies, who monitors the monitor?</p>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="color: var(--accent-green); margin-bottom: 20px; font-size: 18px;">✓ Argus Solution</h3>
+                    <div class="card solution-card" style="margin-bottom: 16px;">
+                        <div class="card-icon">💓</div>
+                        <h3>Watchdog Heartbeat Detection</h3>
+                        <p>Prometheus sends periodic heartbeats. If they stop, Argus immediately fires a "Prometheus Down" alert—no more silent failures.</p>
+                    </div>
+                    <div class="card solution-card" style="margin-bottom: 16px;">
+                        <div class="card-icon">🛡️</div>
+                        <h3>Intelligent Suppression</h3>
+                        <p>Configurable suppression windows prevent duplicate NOC tickets. First alert goes through; subsequent ones are suppressed until resolved.</p>
+                    </div>
+                    <div class="card solution-card" style="margin-bottom: 16px;">
+                        <div class="card-icon">🔗</div>
+                        <h3>Unified Alert Vector</h3>
+                        <p>All alert sources feed into a single AlertVector. One dashboard, one API, one source of truth for all monitoring data.</p>
+                    </div>
+                    <div class="card solution-card">
+                        <div class="card-icon">👑</div>
+                        <h3>Leader/Follower HA</h3>
+                        <p>Kubernetes Lease-based election. All pods run identical logic; only the leader sends NOC alerts. Automatic failover in seconds.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 3: What is Argus -->
+    <div class="slide">
+        <div class="decorative-grid"></div>
+        <div class="slide-header">
+            <h2>What is Argus?</h2>
+            <div class="subtitle">A unified observability platform built for enterprise reliability</div>
+        </div>
+        <div class="slide-body">
+            <div class="grid-3">
+                <div class="card">
+                    <div class="card-icon blue">🎯</div>
+                    <h3>Unified Alert Coordinator</h3>
+                    <p>Ingests alerts from Prometheus, K8s events, and application heartbeats. Normalizes, deduplicates, and routes to NOC with intelligent suppression.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon green">⏱️</div>
+                    <h3>CentralTimer Engine</h3>
+                    <p>Tick-based architecture (default 10s) drives all monitoring callbacks. Deterministic, testable, and observable execution model.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon purple">🔄</div>
+                    <h3>Self-Healing LivenessVector</h3>
+                    <p>Internal health tracking for all callbacks. Components must "stamp" on completion or are marked unhealthy—Argus monitors itself.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon orange">📊</div>
+                    <h3>OpenTelemetry Native</h3>
+                    <p>Built on OTEL standards. Metrics, traces, and logs flow to Grafana, Jaeger, and Elasticsearch via OTEL Collector.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon cyan">🔌</div>
+                    <h3>ArgusApi SDK</h3>
+                    <p>Drop-in .NET library for applications. Emit heartbeats, exceptions, and custom metrics with 3 lines of code.</p>
+                </div>
+                <div class="card">
+                    <div class="card-icon red">👑</div>
+                    <h3>High Availability</h3>
+                    <p>Kubernetes Lease-based leader election. Multiple pods, one leader. Automatic failover ensures zero downtime.</p>
+                </div>
+            </div>
+            <div style="margin-top: 30px; display: flex; gap: 20px;">
+                <div class="card" style="flex: 1; text-align: center;">
+                    <div class="metric-value">10s</div>
+                    <div class="metric-label">Default Tick Interval</div>
+                </div>
+                <div class="card" style="flex: 1; text-align: center;">
+                    <div class="metric-value">30s</div>
+                    <div class="metric-label">Heartbeat Expiry</div>
+                </div>
+                <div class="card" style="flex: 1; text-align: center;">
+                    <div class="metric-value">15m</div>
+                    <div class="metric-label">Default Suppression</div>
+                </div>
+                <div class="card" style="flex: 1; text-align: center;">
+                    <div class="metric-value">5m</div>
+                    <div class="metric-label">Grace Period</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 4: Architecture Diagram -->
+    <div class="slide">
+        <div class="decorative-grid"></div>
+        <div class="slide-header">
+            <h2>Architecture Overview</h2>
+            <div class="subtitle">Data flow from sources through Argus to observability stack</div>
+        </div>
+        <div class="slide-body arch-container">
+            <svg viewBox="0 0 1100 520" class="arch-svg">
+                <defs>
+                    <marker id="arrow-blue" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                        <polygon points="0 0, 8 3, 0 6" fill="#3b82f6"/>
+                    </marker>
+                    <marker id="arrow-green" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                        <polygon points="0 0, 8 3, 0 6" fill="#10b981"/>
+                    </marker>
+                    <marker id="arrow-orange" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                        <polygon points="0 0, 8 3, 0 6" fill="#f59e0b"/>
+                    </marker>
+                    <marker id="arrow-purple" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+                        <polygon points="0 0, 8 3, 0 6" fill="#8b5cf6"/>
+                    </marker>
+                    <linearGradient id="argus-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" style="stop-color:#3b82f6"/>
+                        <stop offset="100%" style="stop-color:#06b6d4"/>
+                    </linearGradient>
+                </defs>
+
+                <!-- K8s Cluster Box -->
+                <rect x="20" y="20" width="200" height="220" rx="8" fill="none" stroke="#3b82f6" stroke-opacity="0.3" stroke-dasharray="4"/>
+                <text x="35" y="42" class="box-label">Kubernetes Cluster</text>
+
+                <rect x="35" y="55" width="170" height="40" rx="6" fill="#1e3a5f" stroke="#3b82f6" stroke-opacity="0.5"/>
+                <text x="120" y="80" class="component-label">K8s API Server</text>
+
+                <rect x="35" y="105" width="80" height="40" rx="6" fill="#1e3a5f" stroke="#3b82f6" stroke-opacity="0.5"/>
+                <text x="75" y="130" class="component-label">KSM</text>
+
+                <rect x="125" y="105" width="80" height="40" rx="6" fill="#4a1d1d" stroke="#ef4444" stroke-opacity="0.5"/>
+                <text x="165" y="125" class="component-label" style="font-size: 10px;">Prometheus</text>
+                <text x="165" y="138" class="component-sublabel">+ Watchdog</text>
+
+                <rect x="35" y="180" width="170" height="50" rx="6" fill="#1a2e1a" stroke="#10b981" stroke-opacity="0.5"/>
+                <text x="120" y="200" class="component-label" style="font-size: 10px;">Business Apps</text>
+                <text x="120" y="215" class="component-sublabel">with ArgusApi SDK</text>
+
+                <!-- ARGUS Central -->
+                <rect x="420" y="120" width="180" height="100" rx="12" fill="url(#argus-gradient)" fill-opacity="0.2" stroke="url(#argus-gradient)"/>
+                <text x="510" y="160" class="component-label" style="font-size: 18px; fill: #fff;">ARGUS</text>
+                <text x="510" y="180" class="component-sublabel" style="fill: #94a3b8;">Coordinator</text>
+                <text x="510" y="200" class="component-sublabel" style="fill: #64748b; font-size: 8px;">CentralTimer • AlertVector • LivenessVector</text>
+
+                <!-- NOC Systems -->
+                <rect x="820" y="30" width="140" height="50" rx="8" fill="#4a1d1d" stroke="#ef4444" stroke-opacity="0.5"/>
+                <text x="890" y="60" class="component-label">NOC</text>
+
+                <rect x="820" y="100" width="140" height="40" rx="6" fill="#1a2e1a" stroke="#10b981" stroke-opacity="0.5"/>
+                <text x="890" y="118" class="component-label" style="font-size: 10px;">NAS</text>
+                <text x="890" y="132" class="component-sublabel">Heartbeat File</text>
+
+                <rect x="820" y="160" width="140" height="40" rx="6" fill="#2d1f4a" stroke="#8b5cf6" stroke-opacity="0.5"/>
+                <text x="890" y="178" class="component-label" style="font-size: 10px; fill: #a78bfa;">SHOB</text>
+                <text x="890" y="192" class="component-sublabel">External Monitor</text>
+
+                <!-- Infrastructure Box -->
+                <rect x="300" y="300" width="500" height="200" rx="8" fill="none" stroke="#f59e0b" stroke-opacity="0.3" stroke-dasharray="4"/>
+                <text x="315" y="322" class="box-label" style="fill: #f59e0b;">Observability Infrastructure</text>
+
+                <rect x="320" y="340" width="100" height="60" rx="6" fill="#3d2e1a" stroke="#f59e0b" stroke-opacity="0.5"/>
+                <text x="370" y="365" class="component-label" style="font-size: 10px;">OTEL</text>
+                <text x="370" y="380" class="component-label" style="font-size: 10px;">Collector</text>
+
+                <rect x="460" y="340" width="100" height="50" rx="6" fill="#1a2e1a" stroke="#10b981" stroke-opacity="0.5"/>
+                <text x="510" y="370" class="component-label" style="font-size: 10px;">Elasticsearch</text>
+
+                <rect x="460" y="410" width="100" height="50" rx="6" fill="#2d1f4a" stroke="#8b5cf6" stroke-opacity="0.5"/>
+                <text x="510" y="440" class="component-label" style="font-size: 10px;">Jaeger</text>
+
+                <rect x="600" y="340" width="80" height="50" rx="6" fill="#1e3a5f" stroke="#3b82f6" stroke-opacity="0.5"/>
+                <text x="640" y="370" class="component-label" style="font-size: 10px;">Kibana</text>
+
+                <rect x="700" y="340" width="80" height="50" rx="6" fill="#3d2e1a" stroke="#f59e0b" stroke-opacity="0.5"/>
+                <text x="740" y="370" class="component-label" style="font-size: 10px;">Grafana</text>
+
+                <!-- Data Flow Arrows -->
+                <!-- K8s to Argus -->
+                <path d="M 205 75 L 280 75 Q 300 75 300 95 L 300 150 L 420 150" stroke="#3b82f6" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+                <text x="260" y="65" style="font-size: 8px; fill: #3b82f6;">Pod/Node Status</text>
+
+                <!-- Prometheus to Argus -->
+                <path d="M 205 125 L 280 125 Q 310 125 310 145 L 310 165 L 420 165" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+                <text x="260" y="115" style="font-size: 8px; fill: #ef4444;">Alerts + Watchdog</text>
+
+                <!-- Apps to Argus -->
+                <path d="M 205 205 L 280 205 Q 320 205 320 185 L 320 175 L 420 175" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#arrow-green)"/>
+                <text x="260" y="220" style="font-size: 8px; fill: #10b981;">Heartbeats</text>
+
+                <!-- Argus to NOC -->
+                <path d="M 600 150 L 700 150 Q 720 150 720 100 L 720 55 L 820 55" stroke="#ef4444" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+                <text x="700" y="40" style="font-size: 8px; fill: #ef4444;">Priority Alerts</text>
+
+                <!-- Argus to NAS -->
+                <path d="M 600 165 L 700 165 Q 740 165 740 140 L 740 120 L 820 120" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#arrow-green)"/>
+                <text x="720" y="155" style="font-size: 8px; fill: #10b981;">Heartbeat</text>
+
+                <!-- SHOB to Argus -->
+                <path d="M 820 180 L 750 180 Q 720 180 720 195 L 720 210 Q 720 225 690 225 L 600 190" stroke="#8b5cf6" stroke-width="2" fill="none" marker-end="url(#arrow-purple)" stroke-dasharray="4"/>
+                <text x="720" y="240" style="font-size: 8px; fill: #8b5cf6;">External Check</text>
+
+                <!-- Argus to OTEL -->
+                <path d="M 510 220 L 510 280 Q 510 300 450 320 L 370 340" stroke="#f59e0b" stroke-width="2" fill="none" marker-end="url(#arrow-orange)"/>
+                <text x="430" y="280" style="font-size: 8px; fill: #f59e0b;">Metrics/Traces/Logs</text>
+
+                <!-- OTEL to backends -->
+                <path d="M 420 370 L 460 365" stroke="#f59e0b" stroke-width="1.5" fill="none" marker-end="url(#arrow-orange)"/>
+                <path d="M 420 380 L 460 435" stroke="#f59e0b" stroke-width="1.5" fill="none" marker-end="url(#arrow-orange)"/>
+                <path d="M 560 365 L 600 365" stroke="#f59e0b" stroke-width="1.5" fill="none" marker-end="url(#arrow-orange)"/>
+                <path d="M 560 365 L 700 365" stroke="#f59e0b" stroke-width="1.5" fill="none" marker-end="url(#arrow-orange)"/>
+
+                <!-- Legend -->
+                <rect x="20" y="450" width="250" height="60" rx="6" fill="#12121a" stroke="#ffffff" stroke-opacity="0.1"/>
+                <text x="35" y="470" style="font-size: 10px; fill: #94a3b8; font-weight: 600;">Data Flow Legend</text>
+                <line x1="35" y1="485" x2="55" y2="485" stroke="#3b82f6" stroke-width="2"/>
+                <text x="60" y="489" style="font-size: 9px; fill: #64748b;">K8s/Prometheus</text>
+                <line x1="130" y1="485" x2="150" y2="485" stroke="#10b981" stroke-width="2"/>
+                <text x="155" y="489" style="font-size: 9px; fill: #64748b;">Heartbeats</text>
+                <line x1="35" y1="500" x2="55" y2="500" stroke="#f59e0b" stroke-width="2"/>
+                <text x="60" y="504" style="font-size: 9px; fill: #64748b;">Telemetry</text>
+                <line x1="130" y1="500" x2="150" y2="500" stroke="#8b5cf6" stroke-width="2" stroke-dasharray="4"/>
+                <text x="155" y="504" style="font-size: 9px; fill: #64748b;">External Monitor</text>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Slide 5: CentralTimer Engine -->
+    <div class="slide">
+        <div class="decorative-grid"></div>
+        <div class="slide-header">
+            <h2>Core Engine: CentralTimer</h2>
+            <div class="subtitle">The heartbeat that drives all monitoring operations</div>
+        </div>
+        <div class="slide-body">
+            <div class="grid-2" style="gap: 40px;">
+                <div>
+                    <h3 style="margin-bottom: 20px; font-size: 16px; color: var(--accent-cyan);">How It Works</h3>
+                    <div class="flow-step">
+                        <div class="flow-number">1</div>
+                        <div class="flow-content">
+                            <h4>Tick Event Fires</h4>
+                            <p>Every 10 seconds (configurable), CentralTimer emits a tick event</p>
+                        </div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-number">2</div>
+                        <div class="flow-content">
+                            <h4>Callbacks Execute</h4>
+                            <p>All registered callbacks run: K8s polling, heartbeat checks, alert processing</p>
+                        </div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-number">3</div>
+                        <div class="flow-content">
+                            <h4>Liveness Stamp</h4>
+                            <p>Each callback must stamp the LivenessVector on completion</p>
+                        </div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-number">4</div>
+                        <div class="flow-content">
+                            <h4>Health Check</h4>
+                            <p>Callbacks that fail to stamp are marked unhealthy</p>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <h3 style="margin-bottom: 12px; font-size: 14px; color: var(--text-secondary);">Registered Callbacks</h3>
+                        <div style="display: flex; flex-wrap: wrap; gap: 8px;">
+                            <span class="badge">K8sLayerCallback</span>
+                            <span class="badge">HeartbeatExpiryCallback</span>
+                            <span class="badge">NocQueueCallback</span>
+                            <span class="badge">SnapshotCallback</span>
+                            <span class="badge">NasHeartbeatCallback</span>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="margin-bottom: 20px; font-size: 16px; color: var(--accent-cyan);">Code Example</h3>
+                    <div class="code-block">
+<span class="comment">// CentralTimer tick handler</span>
+<span class="keyword">private async</span> Task <span class="method">OnTickAsync</span>()
+{
+    <span class="keyword">foreach</span> (<span class="keyword">var</span> callback <span class="keyword">in</span> _callbacks)
+    {
+        <span class="keyword">try</span>
+        {
+            <span class="keyword">await</span> callback.<span class="method">ExecuteAsync</span>();
+            _livenessVector.<span class="method">Stamp</span>(callback.Name);
+        }
+        <span class="keyword">catch</span> (Exception ex)
+        {
+            _metrics.<span class="method">RecordCallbackError</span>(callback.Name);
+            _logger.<span class="method">LogError</span>(ex, <span class="string">"Callback failed"</span>);
+        }
+    }
+    _metrics.<span class="method">IncrementTickCount</span>();
+}
+                    </div>
+                    <div style="margin-top: 24px;">
+                        <h3 style="margin-bottom: 12px; font-size: 14px; color: var(--text-secondary);">Key Metrics Emitted</h3>
+                        <div class="grid-2" style="gap: 12px;">
+                            <div class="card" style="padding: 12px;">
+                                <code style="color: var(--accent-blue); font-size: 11px;">argus_central_timer_tick_count</code>
+                                <p style="font-size: 11px; margin-top: 4px;">Total ticks executed</p>
+                            </div>
+                            <div class="card" style="padding: 12px;">
+                                <code style="color: var(--accent-blue); font-size: 11px;">argus_callback_duration_seconds</code>
+                                <p style="font-size: 11px; margin-top: 4px;">Callback execution time</p>
+                            </div>
+                            <div class="card" style="padding: 12px;">
+                                <code style="color: var(--accent-blue); font-size: 11px;">argus_callback_errors_total</code>
+                                <p style="font-size: 11px; margin-top: 4px;">Failed callback count</p>
+                            </div>
+                            <div class="card" style="padding: 12px;">
+                                <code style="color: var(--accent-blue); font-size: 11px;">argus_callback_skipped_total</code>
+                                <p style="font-size: 11px; margin-top: 4px;">Skipped callbacks</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 6: Alert Processing Pipeline -->
+    <div class="slide">
+        <div class="decorative-grid"></div>
+        <div class="slide-header">
+            <h2>Alert Processing Pipeline</h2>
+            <div class="subtitle">From source to NOC with intelligent filtering and suppression</div>
+        </div>
+        <div class="slide-body">
+            <svg viewBox="0 0 1100 500" style="width: 100%; height: 100%;">
+                <!-- Pipeline stages -->
+                <defs>
+                    <linearGradient id="stage-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:0.2"/>
+                        <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:0.2"/>
+                    </linearGradient>
+                </defs>
+
+                <!-- Stage 1: Sources -->
+                <rect x="30" y="80" width="150" height="300" rx="8" fill="url(#stage-gradient)" stroke="#3b82f6" stroke-opacity="0.3"/>
+                <text x="105" y="60" style="font-size: 12px; fill: #94a3b8; text-anchor: middle; font-weight: 600;">SOURCES</text>
+
+                <rect x="45" y="100" width="120" height="50" rx="6" fill="#4a1d1d" stroke="#ef4444" stroke-opacity="0.5"/>
+                <text x="105" y="120" style="font-size: 10px; fill: #fff; text-anchor: middle;">Prometheus</text>
+                <text x="105" y="135" style="font-size: 8px; fill: #94a3b8; text-anchor: middle;">platform=argus alerts</text>
+
+                <rect x="45" y="165" width="120" height="50" rx="6" fill="#1e3a5f" stroke="#3b82f6" stroke-opacity="0.5"/>
+                <text x="105" y="185" style="font-size: 10px; fill: #fff; text-anchor: middle;">K8s Events</text>
+                <text x="105" y="200" style="font-size: 8px; fill: #94a3b8; text-anchor: middle;">Pod/Node failures</text>
+
+                <rect x="45" y="230" width="120" height="50" rx="6" fill="#1a2e1a" stroke="#10b981" stroke-opacity="0.5"/>
+                <text x="105" y="250" style="font-size: 10px; fill: #fff; text-anchor: middle;">App Heartbeats</text>
+                <text x="105" y="265" style="font-size: 8px; fill: #94a3b8; text-anchor: middle;">ArgusApi SDK</text>
+
+                <rect x="45" y="295" width="120" height="50" rx="6" fill="#3d2e1a" stroke="#f59e0b" stroke-opacity="0.5"/>
+                <text x="105" y="315" style="font-size: 10px; fill: #fff; text-anchor: middle;">Watchdog</text>
+                <text x="105" y="330" style="font-size: 8px; fill: #94a3b8; text-anchor: middle;">Prometheus heartbeat</text>
+
+                <!-- Arrow to Stage 2 -->
+                <path d="M 180 230 L 230 230" stroke="#3b82f6" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+
+                <!-- Stage 2: Ingestion -->
+                <rect x="240" y="130" width="140" height="200" rx="8" fill="url(#stage-gradient)" stroke="#3b82f6" stroke-opacity="0.3"/>
+                <text x="310" y="110" style="font-size: 12px; fill: #94a3b8; text-anchor: middle; font-weight: 600;">INGESTION</text>
+
+                <rect x="255" y="150" width="110" height="40" rx="6" fill="#12121a" stroke="#ffffff" stroke-opacity="0.1"/>
+                <text x="310" y="175" style="font-size: 10px; fill: #fff; text-anchor: middle;">Label Filter</text>
+
+                <rect x="255" y="205" width="110" height="40" rx="6" fill="#12121a" stroke="#ffffff" stroke-opacity="0.1"/>
+                <text x="310" y="230" style="font-size: 10px; fill: #fff; text-anchor: middle;">Normalization</text>
+
+                <rect x="255" y="260" width="110" height="40" rx="6" fill="#12121a" stroke="#ffffff" stroke-opacity="0.1"/>
+                <text x="310" y="285" style="font-size: 10px; fill: #fff; text-anchor: middle;">Deduplication</text>
+
+                <!-- Arrow to Stage 3 -->
+                <path d="M 380 230 L 430 230" stroke="#3b82f6" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+
+                <!-- Stage 3: AlertVector -->
+                <rect x="440" y="100" width="160" height="260" rx="8" fill="url(#stage-gradient)" stroke="#06b6d4" stroke-opacity="0.5"/>
+                <text x="520" y="80" style="font-size: 12px; fill: #06b6d4; text-anchor: middle; font-weight: 600;">ALERT VECTOR</text>
+
+                <rect x="455" y="120" width="130" height="35" rx="6" fill="#12121a" stroke="#06b6d4" stroke-opacity="0.3"/>
+                <text x="520" y="142" style="font-size: 9px; fill: #fff; text-anchor: middle;">In-Memory State</text>
+
+                <rect x="455" y="165" width="130" height="35" rx="6" fill="#12121a" stroke="#06b6d4" stroke-opacity="0.3"/>
+                <text x="520" y="187" style="font-size: 9px; fill: #fff; text-anchor: middle;">Status Tracking</text>
+
+                <rect x="455" y="210" width="130" height="35" rx="6" fill="#12121a" stroke="#06b6d4" stroke-opacity="0.3"/>
+                <text x="520" y="232" style="font-size: 9px; fill: #fff; text-anchor: middle;">Lifecycle Events</text>
+
+                <rect x="455" y="255" width="130" height="35" rx="6" fill="#12121a" stroke="#06b6d4" stroke-opacity="0.3"/>
+                <text x="520" y="277" style="font-size: 9px; fill: #fff; text-anchor: middle;">Suppression State</text>
+
+                <rect x="455" y="300" width="130" height="35" rx="6" fill="#12121a" stroke="#06b6d4" stroke-opacity="0.3"/>
+                <text x="520" y="322" style="font-size: 9px; fill: #fff; text-anchor: middle;">NOC Queue</text>
+
+                <!-- Arrow to Stage 4 -->
+                <path d="M 600 230 L 650 230" stroke="#3b82f6" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+
+                <!-- Stage 4: NOC Decision -->
+                <rect x="660" y="130" width="140" height="200" rx="8" fill="url(#stage-gradient)" stroke="#f59e0b" stroke-opacity="0.3"/>
+                <text x="730" y="110" style="font-size: 12px; fill: #f59e0b; text-anchor: middle; font-weight: 600;">NOC DECISION</text>
+
+                <rect x="675" y="150" width="110" height="40" rx="6" fill="#12121a" stroke="#ffffff" stroke-opacity="0.1"/>
+                <text x="730" y="170" style="font-size: 9px; fill: #fff; text-anchor: middle;">Leader Check</text>
+                <text x="730" y="182" style="font-size: 7px; fill: #64748b; text-anchor: middle;">Only leader sends</text>
+
+                <rect x="675" y="205" width="110" height="40" rx="6" fill="#12121a" stroke="#ffffff" stroke-opacity="0.1"/>
+                <text x="730" y="225" style="font-size: 9px; fill: #fff; text-anchor: middle;">Suppression Check</text>
+                <text x="730" y="237" style="font-size: 7px; fill: #64748b; text-anchor: middle;">15min window</text>
+
+                <rect x="675" y="260" width="110" height="40" rx="6" fill="#12121a" stroke="#ffffff" stroke-opacity="0.1"/>
+                <text x="730" y="280" style="font-size: 9px; fill: #fff; text-anchor: middle;">Grace Period</text>
+                <text x="730" y="292" style="font-size: 7px; fill: #64748b; text-anchor: middle;">5min startup delay</text>
+
+                <!-- Arrow to Stage 5 -->
+                <path d="M 800 230 L 850 230" stroke="#3b82f6" stroke-width="2" fill="none" marker-end="url(#arrow-blue)"/>
+
+                <!-- Stage 5: Output -->
+                <rect x="860" y="80" width="150" height="300" rx="8" fill="url(#stage-gradient)" stroke="#10b981" stroke-opacity="0.3"/>
+                <text x="935" y="60" style="font-size: 12px; fill: #10b981; text-anchor: middle; font-weight: 600;">OUTPUT</text>
+
+                <rect x="875" y="100" width="120" height="50" rx="6" fill="#4a1d1d" stroke="#ef4444" stroke-opacity="0.5"/>
+                <text x="935" y="120" style="font-size: 10px; fill: #fff; text-anchor: middle;">NOC Alert</text>
+                <text x="935" y="135" style="font-size: 8px; fill: #94a3b8; text-anchor: middle;">HTTP POST</text>
+
+                <rect x="875" y="165" width="120" height="50" rx="6" fill="#3d2e1a" stroke="#f59e0b" stroke-opacity="0.5"/>
+                <text x="935" y="185" style="font-size: 10px; fill: #fff; text-anchor: middle;">OTEL Metrics</text>
+                <text x="935" y="200" style="font-size: 8px; fill: #94a3b8; text-anchor: middle;">Grafana dashboards</text>
+
+                <rect x="875" y="230" width="120" height="50" rx="6" fill="#2d1f4a" stroke="#8b5cf6" stroke-opacity="0.5"/>
+                <text x="935" y="250" style="font-size: 10px; fill: #fff; text-anchor: middle;">OTEL Traces</text>
+                <text x="935" y="265" style="font-size: 8px; fill: #94a3b8; text-anchor: middle;">Jaeger</text>
+
+                <rect x="875" y="295" width="120" height="50" rx="6" fill="#1e3a5f" stroke="#3b82f6" stroke-opacity="0.5"/>
+                <text x="935" y="315" style="font-size: 10px; fill: #fff; text-anchor: middle;">OTEL Logs</text>
+                <text x="935" y="330" style="font-size: 8px; fill: #94a3b8; text-anchor: middle;">Elasticsearch/Kibana</text>
+
+                <!-- Metrics at bottom -->
+                <rect x="30" y="420" width="250" height="70" rx="6" fill="#12121a" stroke="#ffffff" stroke-opacity="0.1"/>
+                <text x="45" y="445" style="font-size: 10px; fill: #94a3b8; font-weight: 600;">Key Metrics</text>
+                <text x="45" y="465" style="font-size: 9px; fill: #3b82f6;">argus_alerts_received</text>
+                <text x="155" y="465" style="font-size: 9px; fill: #3b82f6;">argus_alerts_filtered</text>
+                <text x="45" y="480" style="font-size: 9px; fill: #3b82f6;">argus_noc_sent</text>
+                <text x="155" y="480" style="font-size: 9px; fill: #3b82f6;">argus_noc_suppressed</text>
+            </svg>
+        </div>
+    </div>
+
+    <!-- Slide 7: LivenessVector -->
+    <div class="slide">
+        <div class="decorative-grid"></div>
+        <div class="slide-header">
+            <h2>Self-Healing: LivenessVector</h2>
+            <div class="subtitle">Argus monitors itself—no silent failures allowed</div>
+        </div>
+        <div class="slide-body">
+            <div class="grid-2" style="gap: 40px;">
+                <div>
+                    <h3 style="margin-bottom: 20px; font-size: 16px; color: var(--accent-purple);">The Problem with Traditional Monitoring</h3>
+                    <div class="card problem-card" style="margin-bottom: 16px;">
+                        <p>Traditional monitors can fail silently. A hung thread, a deadlock, or an exception loop can leave your monitoring blind without any indication.</p>
+                    </div>
+
+                    <h3 style="margin-bottom: 16px; margin-top: 24px; font-size: 16px; color: var(--accent-green);">LivenessVector Solution</h3>
+                    <ul class="feature-list">
+                        <li>
+                            <div class="feature-icon" style="background: rgba(139, 92, 246, 0.2);">📋</div>
+                            <div class="feature-content">
+                                <h4>Callback Registration</h4>
+                                <p>Each callback registers with LivenessVector on startup</p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="feature-icon" style="background: rgba(16, 185, 129, 0.2);">✓</div>
+                            <div class="feature-content">
+                                <h4>Stamp on Completion</h4>
+                                <p>Callbacks must call Stamp() after successful execution</p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="feature-icon" style="background: rgba(239, 68, 68, 0.2);">⏰</div>
+                            <div class="feature-content">
+                                <h4>Expiry Detection</h4>
+                                <p>Callbacks that miss stamps are marked unhealthy</p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="feature-icon" style="background: rgba(59, 130, 246, 0.2);">📊</div>
+                            <div class="feature-content">
+                                <h4>Health Metrics</h4>
+                                <p>Exposed via OTEL for Grafana alerting</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="margin-bottom: 20px; font-size: 16px; color: var(--accent-purple);">LivenessVector State</h3>
+                    <div class="code-block" style="margin-bottom: 20px;">
+<span class="comment">// LivenessVector tracks callback health</span>
+<span class="keyword">public class</span> <span class="class">LivenessVector</span>
+{
+    <span class="keyword">private readonly</span> ConcurrentDictionary&lt;<span class="keyword">string</span>, CallbackState&gt; _states;
+
+    <span class="keyword">public void</span> <span class="method">Register</span>(<span class="keyword">string</span> callbackName)
+    {
+        _states[callbackName] = <span class="keyword">new</span> CallbackState
+        {
+            LastStamp = DateTime.UtcNow,
+            IsHealthy = <span class="keyword">true</span>
+        };
+    }
+
+    <span class="keyword">public void</span> <span class="method">Stamp</span>(<span class="keyword">string</span> callbackName)
+    {
+        _states[callbackName].LastStamp = DateTime.UtcNow;
+        _states[callbackName].IsHealthy = <span class="keyword">true</span>;
+    }
+
+    <span class="keyword">public bool</span> <span class="method">IsHealthy</span>() =&gt;
+        _states.Values.<span class="method">All</span>(s =&gt; s.IsHealthy);
+}
+                    </div>
+
+                    <h3 style="margin-bottom: 12px; font-size: 14px; color: var(--text-secondary);">Exposed Metrics</h3>
+                    <div class="grid-2" style="gap: 12px;">
+                        <div class="card" style="padding: 12px;">
+                            <code style="color: var(--accent-purple); font-size: 10px;">argus_liveness_vector_healthy</code>
+                            <p style="font-size: 10px; margin-top: 4px;">1 = all healthy, 0 = degraded</p>
+                        </div>
+                        <div class="card" style="padding: 12px;">
+                            <code style="color: var(--accent-purple); font-size: 10px;">argus_liveness_vector_size</code>
+                            <p style="font-size: 10px; margin-top: 4px;">Number of registered callbacks</p>
+                        </div>
+                        <div class="card" style="padding: 12px;">
+                            <code style="color: var(--accent-purple); font-size: 10px;">argus_liveness_unhealthy_count</code>
+                            <p style="font-size: 10px; margin-top: 4px;">Count of unhealthy callbacks</p>
+                        </div>
+                        <div class="card" style="padding: 12px;">
+                            <code style="color: var(--accent-purple); font-size: 10px;">argus_external_monitor_ok</code>
+                            <p style="font-size: 10px; margin-top: 4px;">SHOB heartbeat status</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 8: Leader Election -->
+    <div class="slide">
+        <div class="decorative-grid"></div>
+        <div class="slide-header">
+            <h2>High Availability: Leader Election</h2>
+            <div class="subtitle">Kubernetes Lease-based coordination for zero-downtime operations</div>
+        </div>
+        <div class="slide-body">
+            <div class="grid-2" style="gap: 40px;">
+                <div>
+                    <h3 style="margin-bottom: 20px; font-size: 16px; color: var(--accent-orange);">How It Works</h3>
+                    <svg viewBox="0 0 400 350" style="width: 100%;">
+                        <!-- Pod 1 - Leader -->
+                        <rect x="20" y="50" width="100" height="80" rx="8" fill="#1a2e1a" stroke="#10b981"/>
+                        <text x="70" y="80" style="font-size: 11px; fill: #fff; text-anchor: middle;">Argus Pod 1</text>
+                        <text x="70" y="100" style="font-size: 9px; fill: #10b981; text-anchor: middle; font-weight: 600;">👑 LEADER</text>
+                        <text x="70" y="118" style="font-size: 8px; fill: #64748b; text-anchor: middle;">Sends NOC alerts</text>
+
+                        <!-- Pod 2 - Follower -->
+                        <rect x="150" y="50" width="100" height="80" rx="8" fill="#12121a" stroke="#64748b"/>
+                        <text x="200" y="80" style="font-size: 11px; fill: #fff; text-anchor: middle;">Argus Pod 2</text>
+                        <text x="200" y="100" style="font-size: 9px; fill: #64748b; text-anchor: middle;">FOLLOWER</text>
+                        <text x="200" y="118" style="font-size: 8px; fill: #64748b; text-anchor: middle;">Ready to take over</text>
+
+                        <!-- Pod 3 - Follower -->
+                        <rect x="280" y="50" width="100" height="80" rx="8" fill="#12121a" stroke="#64748b"/>
+                        <text x="330" y="80" style="font-size: 11px; fill: #fff; text-anchor: middle;">Argus Pod 3</text>
+                        <text x="330" y="100" style="font-size: 9px; fill: #64748b; text-anchor: middle;">FOLLOWER</text>
+                        <text x="330" y="118" style="font-size: 8px; fill: #64748b; text-anchor: middle;">Ready to take over</text>
+
+                        <!-- K8s Lease -->
+                        <rect x="120" y="180" width="160" height="60" rx="8" fill="#1e3a5f" stroke="#3b82f6"/>
+                        <text x="200" y="205" style="font-size: 11px; fill: #fff; text-anchor: middle;">Kubernetes Lease</text>
+                        <text x="200" y="225" style="font-size: 9px; fill: #3b82f6; text-anchor: middle;">argus-leader-election</text>
+
+                        <!-- Arrows to Lease -->
+                        <path d="M 70 130 L 70 170 Q 70 190 100 200 L 120 205" stroke="#10b981" stroke-width="2" fill="none"/>
+                        <path d="M 200 130 L 200 180" stroke="#64748b" stroke-width="1.5" fill="none" stroke-dasharray="4"/>
+                        <path d="M 330 130 L 330 170 Q 330 190 300 200 L 280 205" stroke="#64748b" stroke-width="1.5" fill="none" stroke-dasharray="4"/>
+
+                        <!-- NOC -->
+                        <rect x="20" y="280" width="100" height="50" rx="8" fill="#4a1d1d" stroke="#ef4444"/>
+                        <text x="70" y="310" style="font-size: 11px; fill: #fff; text-anchor: middle;">NOC</text>
+
+                        <!-- Arrow from Leader to NOC -->
+                        <path d="M 70 130 L 70 150 Q 70 160 50 180 L 50 250 L 50 280" stroke="#10b981" stroke-width="2" fill="none" marker-end="url(#arrow-green)"/>
+                        <text x="30" y="220" style="font-size: 8px; fill: #10b981;">Alerts</text>
+                    </svg>
+                </div>
+                <div>
+                    <h3 style="margin-bottom: 16px; font-size: 16px; color: var(--accent-orange);">Key Behaviors</h3>
+                    <div class="card" style="margin-bottom: 12px;">
+                        <h3 style="font-size: 14px;">🔄 All Pods Run Identical Logic</h3>
+                        <p>Every pod executes the same callbacks, maintains the same AlertVector state. Only NOC sending is gated by leadership.</p>
+                    </div>
+                    <div class="card" style="margin-bottom: 12px;">
+                        <h3 style="font-size: 14px;">⚡ Automatic Failover</h3>
+                        <p>If the leader pod dies, another pod acquires the lease within seconds. No manual intervention required.</p>
+                    </div>
+                    <div class="card" style="margin-bottom: 12px;">
+                        <h3 style="font-size: 14px;">🛡️ No Duplicate Alerts</h3>
+                        <p>Only the leader sends to NOC. Followers process alerts but suppress NOC output, preventing duplicates.</p>
+                    </div>
+                    <div class="card" style="margin-bottom: 12px;">
+                        <h3 style="font-size: 14px;">📊 Leadership Metrics</h3>
+                        <p><code style="color: var(--accent-blue);">argus_is_leader</code> gauge (1/0) for Grafana dashboards and alerting.</p>
+                    </div>
+
+                    <div style="margin-top: 20px; padding: 16px; background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.3); border-radius: 8px;">
+                        <h4 style="font-size: 12px; color: var(--accent-orange); margin-bottom: 8px;">Configuration</h4>
+                        <code style="font-size: 11px; color: var(--text-secondary);">
+                            LeaderElection__LeaseName: "argus-leader"<br>
+                            LeaderElection__LeaseNamespace: "monitoring"<br>
+                            LeaderElection__LeaseDurationSeconds: 15<br>
+                            LeaderElection__RenewDeadlineSeconds: 10
+                        </code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 9: ArgusApi SDK -->
+    <div class="slide">
+        <div class="decorative-grid"></div>
+        <div class="slide-header">
+            <h2>Developer Experience: ArgusApi SDK</h2>
+            <div class="subtitle">Drop-in .NET library for application heartbeats and metrics</div>
+        </div>
+        <div class="slide-body">
+            <div class="grid-2" style="gap: 40px;">
+                <div>
+                    <h3 style="margin-bottom: 20px; font-size: 16px; color: var(--accent-cyan);">Quick Start (3 Lines)</h3>
+                    <div class="code-block" style="margin-bottom: 24px;">
+<span class="comment">// Program.cs - Add Argus to your app</span>
+builder.Services.<span class="method">AddArgusApi</span>(options =&gt;
+{
+    options.ApplicationName = <span class="string">"MyService"</span>;
+    options.ArgusEndpoint = <span class="string">"http://argus:8080"</span>;
+    options.HeartbeatIntervalSeconds = 10;
+});
+
+<span class="comment">// That's it! Heartbeats are automatic.</span>
+                    </div>
+
+                    <h3 style="margin-bottom: 16px; font-size: 16px; color: var(--accent-cyan);">Advanced Usage</h3>
+                    <div class="code-block">
+<span class="comment">// Inject IArgusClient for custom events</span>
+<span class="keyword">public class</span> <span class="class">OrderService</span>
+{
+    <span class="keyword">private readonly</span> IArgusClient _argus;
+
+    <span class="keyword">public async</span> Task <span class="method">ProcessOrder</span>(Order order)
+    {
+        <span class="keyword">try</span>
+        {
+            <span class="comment">// Business logic...</span>
+            <span class="keyword">await</span> _argus.<span class="method">SendHeartbeatAsync</span>(
+                <span class="string">"order-processing"</span>);
+        }
+        <span class="keyword">catch</span> (Exception ex)
+        {
+            <span class="keyword">await</span> _argus.<span class="method">SendExceptionAsync</span>(ex,
+                severity: AlertSeverity.Critical);
+            <span class="keyword">throw</span>;
+        }
+    }
+}
+                    </div>
+                </div>
+                <div>
+                    <h3 style="margin-bottom: 20px; font-size: 16px; color: var(--accent-cyan);">SDK Features</h3>
+                    <div class="card" style="margin-bottom: 12px;">
+                        <div class="card-icon cyan">💓</div>
+                        <h3>Automatic Heartbeats</h3>
+                        <p>Background service sends periodic heartbeats. If your app stops, Argus knows immediately.</p>
+                    </div>
+                    <div class="card" style="margin-bottom: 12px;">
+                        <div class="card-icon orange">⚠️</div>
+                        <h3>Exception Reporting</h3>
+                        <p>Send exceptions with severity levels. Critical exceptions trigger immediate NOC alerts.</p>
+                    </div>
+                    <div class="card" style="margin-bottom: 12px;">
+                        <div class="card-icon purple">📊</div>
+                        <h3>Custom Metrics</h3>
+                        <p>Emit application-specific metrics that flow through Argus to Grafana.</p>
+                    </div>
+                    <div class="card" style="margin-bottom: 12px;">
+                        <div class="card-icon green">🔄</div>
+                        <h3>Retry & Circuit Breaker</h3>
+                        <p>Built-in resilience patterns. SDK won't crash your app if Argus is temporarily unavailable.</p>
+                    </div>
+
+                    <div style="margin-top: 20px; padding: 16px; background: rgba(6, 182, 212, 0.1); border: 1px solid rgba(6, 182, 212, 0.3); border-radius: 8px;">
+                        <h4 style="font-size: 12px; color: var(--accent-cyan); margin-bottom: 8px;">NuGet Package</h4>
+                        <code style="font-size: 12px; color: var(--text-primary);">
+                            dotnet add package Argus.Api
+                        </code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 10: Competitive Comparison -->
+    <div class="slide">
+        <div class="decorative-grid"></div>
+        <div class="slide-header">
+            <h2>Why Argus?</h2>
+            <div class="subtitle">Feature comparison with alternative approaches</div>
+        </div>
+        <div class="slide-body">
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Capability</th>
+                        <th style="width: 15%;">Argus</th>
+                        <th style="width: 15%;">Prometheus Only</th>
+                        <th style="width: 15%;">AlertManager</th>
+                        <th style="width: 15%;">PagerDuty</th>
+                        <th style="width: 15%;">Custom Scripts</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Prometheus Watchdog (detect silent failures)</td>
+                        <td class="check">✓ Built-in</td>
+                        <td class="cross">✗</td>
+                        <td class="partial">◐ Manual</td>
+                        <td class="cross">✗</td>
+                        <td class="partial">◐ DIY</td>
+                    </tr>
+                    <tr>
+                        <td>K8s Health Integration</td>
+                        <td class="check">✓ Native</td>
+                        <td class="partial">◐ Via KSM</td>
+                        <td class="cross">✗</td>
+                        <td class="cross">✗</td>
+                        <td class="partial">◐ DIY</td>
+                    </tr>
+                    <tr>
+                        <td>Application Heartbeats</td>
+                        <td class="check">✓ SDK</td>
+                        <td class="cross">✗</td>
+                        <td class="cross">✗</td>
+                        <td class="partial">◐ API</td>
+                        <td class="partial">◐ DIY</td>
+                    </tr>
+                    <tr>
+                        <td>Intelligent Suppression</td>
+                        <td class="check">✓ Configurable</td>
+                        <td class="cross">✗</td>
+                        <td class="check">✓</td>
+                        <td class="check">✓</td>
+                        <td class="partial">◐ DIY</td>
+                    </tr>
+                    <tr>
+                        <td>Self-Healing (LivenessVector)</td>
+                        <td class="check">✓ Built-in</td>
+                        <td class="cross">✗</td>
+                        <td class="cross">✗</td>
+                        <td class="cross">✗</td>
+                        <td class="cross">✗</td>
+                    </tr>
+                    <tr>
+                        <td>Leader/Follower HA</td>
+                        <td class="check">✓ K8s Lease</td>
+                        <td class="cross">✗</td>
+                        <td class="check">✓</td>
+                        <td class="check">✓ SaaS</td>
+                        <td class="cross">✗</td>
+                    </tr>
+                    <tr>
+                        <td>OpenTelemetry Native</td>
+                        <td class="check">✓ Full</td>
+                        <td class="partial">◐ Metrics</td>
+                        <td class="cross">✗</td>
+                        <td class="cross">✗</td>
+                        <td class="cross">✗</td>
+                    </tr>
+                    <tr>
+                        <td>On-Premises Deployment</td>
+                        <td class="check">✓</td>
+                        <td class="check">✓</td>
+                        <td class="check">✓</td>
+                        <td class="cross">✗ SaaS</td>
+                        <td class="check">✓</td>
+                    </tr>
+                    <tr>
+                        <td>Unified Alert Vector</td>
+                        <td class="check">✓</td>
+                        <td class="cross">✗</td>
+                        <td class="partial">◐</td>
+                        <td class="partial">◐</td>
+                        <td class="cross">✗</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="margin-top: 30px; display: flex; gap: 20px;">
+                <div class="card" style="flex: 1; text-align: center; border-color: rgba(16, 185, 129, 0.3);">
+                    <div style="font-size: 24px; margin-bottom: 8px;">🎯</div>
+                    <h3 style="font-size: 14px; color: var(--accent-green);">Purpose-Built</h3>
+                    <p style="font-size: 12px;">Designed specifically for enterprise NOC integration</p>
+                </div>
+                <div class="card" style="flex: 1; text-align: center; border-color: rgba(59, 130, 246, 0.3);">
+                    <div style="font-size: 24px; margin-bottom: 8px;">🔒</div>
+                    <h3 style="font-size: 14px; color: var(--accent-blue);">On-Premises</h3>
+                    <p style="font-size: 12px;">Full control, no external dependencies</p>
+                </div>
+                <div class="card" style="flex: 1; text-align: center; border-color: rgba(139, 92, 246, 0.3);">
+                    <div style="font-size: 24px; margin-bottom: 8px;">⚡</div>
+                    <h3 style="font-size: 14px; color: var(--accent-purple);">Self-Healing</h3>
+                    <p style="font-size: 12px;">Monitors itself, automatic recovery</p>
+                </div>
+                <div class="card" style="flex: 1; text-align: center; border-color: rgba(245, 158, 11, 0.3);">
+                    <div style="font-size: 24px; margin-bottom: 8px;">📊</div>
+                    <h3 style="font-size: 14px; color: var(--accent-orange);">Observable</h3>
+                    <p style="font-size: 12px;">Full OTEL integration out of the box</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 11: Metrics & Observability -->
+    <div class="slide">
+        <div class="decorative-grid"></div>
+        <div class="slide-header">
+            <h2>Complete Observability</h2>
+            <div class="subtitle">Every metric you need for operational excellence</div>
+        </div>
+        <div class="slide-body">
+            <div class="grid-3" style="gap: 16px;">
+                <!-- Ingestion Metrics -->
+                <div class="card" style="border-color: rgba(59, 130, 246, 0.3);">
+                    <h3 style="color: var(--accent-blue); font-size: 14px; margin-bottom: 12px;">📥 Ingestion Metrics</h3>
+                    <div style="font-size: 11px; line-height: 2;">
+                        <code style="color: var(--text-secondary);">argus_alerts_received</code><br>
+                        <code style="color: var(--text-secondary);">argus_alerts_filtered</code><br>
+                        <code style="color: var(--text-secondary);">argus_alerts_received_by_source</code>
+                    </div>
+                </div>
+
+                <!-- Lifecycle Metrics -->
+                <div class="card" style="border-color: rgba(16, 185, 129, 0.3);">
+                    <h3 style="color: var(--accent-green); font-size: 14px; margin-bottom: 12px;">🔄 Lifecycle Metrics</h3>
+                    <div style="font-size: 11px; line-height: 2;">
+                        <code style="color: var(--text-secondary);">argus_alerts_created</code><br>
+                        <code style="color: var(--text-secondary);">argus_alerts_resolved</code><br>
+                        <code style="color: var(--text-secondary);">argus_alerts_vector_by_status</code>
+                    </div>
+                </div>
+
+                <!-- NOC Metrics -->
+                <div class="card" style="border-color: rgba(239, 68, 68, 0.3);">
+                    <h3 style="color: var(--accent-red); font-size: 14px; margin-bottom: 12px;">🔔 NOC Metrics</h3>
+                    <div style="font-size: 11px; line-height: 2;">
+                        <code style="color: var(--text-secondary);">argus_noc_decisions</code><br>
+                        <code style="color: var(--text-secondary);">argus_noc_sent</code><br>
+                        <code style="color: var(--text-secondary);">argus_noc_suppressed</code>
+                    </div>
+                </div>
+
+                <!-- Health Metrics -->
+                <div class="card" style="border-color: rgba(139, 92, 246, 0.3);">
+                    <h3 style="color: var(--accent-purple); font-size: 14px; margin-bottom: 12px;">💓 Health Metrics</h3>
+                    <div style="font-size: 11px; line-height: 2;">
+                        <code style="color: var(--text-secondary);">argus_grace_period_active</code><br>
+                        <code style="color: var(--text-secondary);">argus_k8s_poll_duration</code><br>
+                        <code style="color: var(--text-secondary);">argus_snapshot_duration</code>
+                    </div>
+                </div>
+
+                <!-- K8s Layer Metrics -->
+                <div class="card" style="border-color: rgba(6, 182, 212, 0.3);">
+                    <h3 style="color: var(--accent-cyan); font-size: 14px; margin-bottom: 12px;">☸️ K8s Layer Metrics</h3>
+                    <div style="font-size: 11px; line-height: 2;">
+                        <code style="color: var(--text-secondary);">argus_k8s_api_available</code><br>
+                        <code style="color: var(--text-secondary);">argus_prometheus_pod_healthy</code><br>
+                        <code style="color: var(--text-secondary);">argus_ksm_pod_healthy</code>
+                    </div>
+                </div>
+
+                <!-- Timer Metrics -->
+                <div class="card" style="border-color: rgba(245, 158, 11, 0.3);">
+                    <h3 style="color: var(--accent-orange); font-size: 14px; margin-bottom: 12px;">⏱️ Timer Metrics</h3>
+                    <div style="font-size: 11px; line-height: 2;">
+                        <code style="color: var(--text-secondary);">argus_central_timer_tick_count</code><br>
+                        <code style="color: var(--text-secondary);">argus_callback_duration</code><br>
+                        <code style="color: var(--text-secondary);">argus_callback_errors</code>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 24px;">
+                <h3 style="font-size: 14px; color: var(--text-secondary); margin-bottom: 16px;">Observability Stack Integration</h3>
+                <div class="grid-4" style="gap: 16px;">
+                    <div class="card" style="text-align: center; padding: 16px;">
+                        <div style="font-size: 32px; margin-bottom: 8px;">📊</div>
+                        <h4 style="font-size: 13px;">Grafana</h4>
+                        <p style="font-size: 11px; color: var(--text-muted);">Dashboards & Alerts</p>
+                    </div>
+                    <div class="card" style="text-align: center; padding: 16px;">
+                        <div style="font-size: 32px; margin-bottom: 8px;">🔍</div>
+                        <h4 style="font-size: 13px;">Jaeger</h4>
+                        <p style="font-size: 11px; color: var(--text-muted);">Distributed Tracing</p>
+                    </div>
+                    <div class="card" style="text-align: center; padding: 16px;">
+                        <div style="font-size: 32px; margin-bottom: 8px;">📝</div>
+                        <h4 style="font-size: 13px;">Elasticsearch</h4>
+                        <p style="font-size: 11px; color: var(--text-muted);">Log Aggregation</p>
+                    </div>
+                    <div class="card" style="text-align: center; padding: 16px;">
+                        <div style="font-size: 32px; margin-bottom: 8px;">🔎</div>
+                        <h4 style="font-size: 13px;">Kibana</h4>
+                        <p style="font-size: 11px; color: var(--text-muted);">Log Analysis</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 24px; padding: 16px; background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 8px;">
+                <h4 style="font-size: 12px; color: var(--accent-blue); margin-bottom: 8px;">OTEL Collector Configuration</h4>
+                <code style="font-size: 11px; color: var(--text-secondary);">
+                    All metrics tagged with <span style="color: var(--accent-cyan);">telemetry_source="argus_service"</span> for easy filtering
+                </code>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 12: Summary & Next Steps -->
+    <div class="slide">
+        <div class="decorative-grid"></div>
+        <div class="decorative-glow glow-blue" style="top: -100px; right: -100px;"></div>
+        <div class="decorative-glow glow-purple" style="bottom: -100px; left: -100px;"></div>
+        <div class="slide-header">
+            <h2>Summary & Next Steps</h2>
+            <div class="subtitle">Bringing enterprise-grade observability to your infrastructure</div>
+        </div>
+        <div class="slide-body">
+            <div class="grid-2" style="gap: 40px; height: 100%;">
+                <div>
+                    <h3 style="margin-bottom: 20px; font-size: 18px; color: var(--accent-blue);">What Argus Delivers</h3>
+                    <ul class="feature-list">
+                        <li>
+                            <div class="feature-icon" style="background: rgba(16, 185, 129, 0.2);">✓</div>
+                            <div class="feature-content">
+                                <h4>No More Silent Failures</h4>
+                                <p>Watchdog heartbeats detect Prometheus outages immediately</p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="feature-icon" style="background: rgba(16, 185, 129, 0.2);">✓</div>
+                            <div class="feature-content">
+                                <h4>Reduced Alert Fatigue</h4>
+                                <p>Intelligent suppression prevents NOC ticket storms</p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="feature-icon" style="background: rgba(16, 185, 129, 0.2);">✓</div>
+                            <div class="feature-content">
+                                <h4>Unified Monitoring</h4>
+                                <p>K8s, Prometheus, and app heartbeats in one system</p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="feature-icon" style="background: rgba(16, 185, 129, 0.2);">✓</div>
+                            <div class="feature-content">
+                                <h4>Self-Healing Architecture</h4>
+                                <p>LivenessVector ensures Argus never fails silently</p>
+                            </div>
+                        </li>
+                        <li>
+                            <div class="feature-icon" style="background: rgba(16, 185, 129, 0.2);">✓</div>
+                            <div class="feature-content">
+                                <h4>Zero-Downtime HA</h4>
+                                <p>Leader election with automatic failover</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 style="margin-bottom: 20px; font-size: 18px; color: var(--accent-orange);">Getting Started</h3>
+                    <div class="flow-step" style="border-color: rgba(59, 130, 246, 0.3);">
+                        <div class="flow-number" style="background: var(--accent-blue);">1</div>
+                        <div class="flow-content">
+                            <h4>Deploy Argus</h4>
+                            <p>Helm chart or Kubernetes manifests in the /deploy folder</p>
+                        </div>
+                    </div>
+                    <div class="flow-step" style="border-color: rgba(16, 185, 129, 0.3);">
+                        <div class="flow-number" style="background: var(--accent-green);">2</div>
+                        <div class="flow-content">
+                            <h4>Configure Prometheus</h4>
+                            <p>Add platform=argus label to alerts you want routed</p>
+                        </div>
+                    </div>
+                    <div class="flow-step" style="border-color: rgba(139, 92, 246, 0.3);">
+                        <div class="flow-number" style="background: var(--accent-purple);">3</div>
+                        <div class="flow-content">
+                            <h4>Integrate ArgusApi SDK</h4>
+                            <p>Add NuGet package to your .NET applications</p>
+                        </div>
+                    </div>
+                    <div class="flow-step" style="border-color: rgba(245, 158, 11, 0.3);">
+                        <div class="flow-number" style="background: var(--accent-orange);">4</div>
+                        <div class="flow-content">
+                            <h4>Import Grafana Dashboards</h4>
+                            <p>Pre-built dashboards in /dashboards folder</p>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 24px; padding: 20px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(139, 92, 246, 0.15) 100%); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 12px; text-align: center;">
+                        <h3 style="font-size: 16px; margin-bottom: 8px;">Ready to See More?</h3>
+                        <p style="font-size: 13px; color: var(--text-secondary);">
+                            Contact the Platform Team for a live demo<br>
+                            <span style="color: var(--accent-blue);">platform-team@company.com</span>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
+
